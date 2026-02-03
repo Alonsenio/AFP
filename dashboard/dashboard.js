@@ -57,5 +57,5 @@ function setActive(el) {
 // Logout
 function cerrarSesion() {
     sessionStorage.clear();
-    window.location.href = 'index.php';
+    window.location.href = '../afp/afp.php';
 }

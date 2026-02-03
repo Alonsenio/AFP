@@ -12,7 +12,7 @@
 <!-- TOPBAR -->
 <header class="topbar">
     <div class="topbar-left">
-        <div class="topbar-logo" onclick="location.href='dashboard.php'">AFPnet<span>PAGO FÁCIL</span></div>
+        <div class="topbar-logo" onclick="location.href='../dashboard/dashboard.php'">AFPnet<span>PAGO FÁCIL</span></div>
         <button class="btn-menu" id="btn-tog"><i class="fas fa-bars"></i></button>
         <div class="topbar-info">
             <span class="ruc" id="tb-ruc">20100000001</span> - <span id="tb-razon">EMPRESA</span><br>
@@ -30,19 +30,19 @@
 <!-- SIDEBAR -->
 <aside class="sidebar" id="sb">
     <nav class="sidebar-nav">
-        <div><a class="nav-link" href="dashboard.php"><span><i class="fas fa-home" style="width:18px;margin-right:8px"></i> Inicio</span></a></div>
+        <div><a class="nav-link" href="../dashboard/dashboard.php"><span><i class="fas fa-home" style="width:18px;margin-right:8px"></i> Inicio</span></a></div>
         <div>
             <div class="nav-link" onclick="togSub(this)"><span><i class="fas fa-cogs" style="width:18px;margin-right:8px"></i> Administración</span><i class="fas fa-chevron-down chv"></i></div>
-            <div class="submenu"><a href="#">Usuarios</a><a href="#">Permisos</a><a href="#">Datos de la empresa</a></div>
+            <div class="submenu"><a href="../usuarios/usuarios.php">Usuarios</a><a href="#">Permisos</a><a href="#">Datos de la empresa</a></div>
         </div>
         <div>
             <div class="nav-link" onclick="togSub(this)"><span><i class="fas fa-file-invoice-dollar" style="width:18px;margin-right:8px"></i> Aportes</span><i class="fas fa-chevron-down chv"></i></div>
-            <div class="submenu"><a href="planillas.php">Presentación y Pago de Planillas</a><a href="#">Consulta y Pago de Planillas</a><a href="#">Consulta y Pago de Regularizaciones</a><a href="#">Pagos Pendientes de 2da firma</a></div>
+            <div class="submenu"><a href="../planillas/planillas.php">Presentación y Pago de Planillas</a><a href="#">Consulta y Pago de Planillas</a><a href="#">Consulta y Pago de Regularizaciones</a><a href="#">Pagos Pendientes de 2da firma</a></div>
         </div>
         <div>
             <div class="nav-link active open" onclick="togSub(this)"><span><i class="fas fa-users" style="width:18px;margin-right:8px"></i> Afiliados</span><i class="fas fa-chevron-down chv"></i></div>
             <div class="submenu open">
-                <a href="afiliados.php" class="act">Consulta de Afiliados Unitaria</a>
+                <a href="../afiliados/afiliados.php" class="act">Consulta de Afiliados Unitaria</a>
                 <a href="#">Consulta de Afiliados Masiva</a>
                 <a href="#">Afiliación Unitaria</a>
                 <a href="#">Afiliación Masiva</a>
@@ -159,6 +159,6 @@
 
     </div>
 </main>
-<script src="afiliados.js"></script>
+<script src="./afiliados.js"></script>
 </body>
 </html>

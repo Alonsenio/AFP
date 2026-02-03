@@ -47,7 +47,7 @@ function togSub(el){
     document.querySelectorAll('.submenu.open').forEach(s=>{if(s!==sub){s.classList.remove('open');s.previousElementSibling.classList.remove('open')}});
     if(!op){sub.classList.add('open');el.classList.add('open')}else{sub.classList.remove('open');el.classList.remove('open')}
 }
-function cerrarSesion(){sessionStorage.clear();location.href='index.php'}
+function cerrarSesion(){sessionStorage.clear();location.href='../afp/afp.php'}
 
 // ===== RADIO TOGGLE LOGIC =====
 function setupRadios(){

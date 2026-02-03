@@ -22,7 +22,7 @@ const sb=document.getElementById('sb'),mc=document.getElementById('mc'),sov=docu
 document.getElementById('btn-tog').onclick=()=>{if(innerWidth<=768){sb.classList.toggle('mob');sov.classList.toggle('vis')}else{sb.classList.toggle('collapsed');mc.classList.toggle('exp')}};
 sov.onclick=()=>{sb.classList.remove('mob');sov.classList.remove('vis')};
 function togSub(el){const sub=el.nextElementSibling;if(!sub)return;const op=sub.classList.contains('open');document.querySelectorAll('.submenu.open').forEach(s=>{if(s!==sub){s.classList.remove('open');s.previousElementSibling.classList.remove('open')}});if(!op){sub.classList.add('open');el.classList.add('open')}else{sub.classList.remove('open');el.classList.remove('open')}}
-function cerrarSesion(){sessionStorage.clear();location.href='index.php'}
+function cerrarSesion(){sessionStorage.clear();location.href='/afp/afp.php'}
 
 // ===== FILE =====
 const fi=document.getElementById('file-input'),fn=document.getElementById('fu-n'),fw=document.getElementById('fu-w');

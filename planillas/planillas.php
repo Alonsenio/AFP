@@ -15,7 +15,7 @@
 <!-- TOPBAR -->
 <header class="topbar">
     <div class="topbar-left">
-        <div class="topbar-logo" onclick="location.href='dashboard.php'">AFPnet<span>PAGO FÁCIL</span></div>
+        <div class="topbar-logo" onclick="location.href='../dashboard/dashboard.php'">AFPnet<span>PAGO FÁCIL</span></div>
         <button class="btn-menu" id="btn-tog"><i class="fas fa-bars"></i></button>
         <div class="topbar-welcome">Bienvenido Sr(a). <strong id="w-name">Usuario</strong></div>
     </div>
@@ -30,18 +30,18 @@
 <!-- SIDEBAR -->
 <aside class="sidebar" id="sb">
     <nav class="sidebar-nav">
-        <div><a class="nav-link" href="dashboard.php"><span><i class="fas fa-home" style="width:18px;margin-right:8px"></i> Inicio</span></a></div>
+        <div><a class="nav-link" href="../dashboard/dashboard.php"><span><i class="fas fa-home" style="width:18px;margin-right:8px"></i> Inicio</span></a></div>
         <div>
             <div class="nav-link" onclick="togSub(this)"><span><i class="fas fa-cogs" style="width:18px;margin-right:8px"></i> Administración</span><i class="fas fa-chevron-down chv"></i></div>
-            <div class="submenu"><a href="#">Usuarios</a><a href="#">Permisos</a><a href="#">Datos de la empresa</a></div>
+            <div class="submenu"><a href="../usuarios/usuarios.php">Usuarios</a><a href="#">Permisos</a><a href="#">Datos de la empresa</a></div>
         </div>
         <div>
             <div class="nav-link active open" onclick="togSub(this)"><span><i class="fas fa-file-invoice-dollar" style="width:18px;margin-right:8px"></i> Aportes</span><i class="fas fa-chevron-down chv"></i></div>
-            <div class="submenu open"><a href="planillas.php" class="act">Presentación y Pago de Planillas</a><a href="#">Consulta y Pago de Planillas</a><a href="#">Consulta y Pago de Regularizaciones</a><a href="#">Pagos Pendientes de 2da firma</a></div>
+            <div class="submenu open"><a href="../planillas/planillas.php" class="act">Presentación y Pago de Planillas</a><a href="#">Consulta y Pago de Planillas</a><a href="#">Consulta y Pago de Regularizaciones</a><a href="#">Pagos Pendientes de 2da firma</a></div>
         </div>
         <div>
             <div class="nav-link" onclick="togSub(this)"><span><i class="fas fa-users" style="width:18px;margin-right:8px"></i> Afiliados</span><i class="fas fa-chevron-down chv"></i></div>
-            <div class="submenu"><a href="afiliados.php">Consultar afiliados</a><a href="#">Afiliar trabajadores al SPP</a></div>
+            <div class="submenu"><a href="../afiliados/afiliados.php">Consultar afiliados</a><a href="#">Afiliar trabajadores al SPP</a></div>
         </div>
         <div>
             <div class="nav-link" onclick="togSub(this)"><span><i class="fas fa-clipboard-list" style="width:18px;margin-right:8px"></i> Módulo REPRO</span><i class="fas fa-chevron-down chv"></i></div>
@@ -135,6 +135,6 @@
         <div class="mf"><button class="btn btn-gray" onclick="closeM('mo-ticket')">REGRESAR</button><button class="btn btn-blue" id="btn-print"><i class="fas fa-print"></i> IMPRIMIR TICKET</button></div>
     </div>
 </div>
-<script src="planillas.js"></script>
+<script src="./planillas.js"></script>
 </body>
 </html>

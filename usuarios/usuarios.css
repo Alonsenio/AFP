@@ -1,0 +1,51 @@
+/* Estilos para la cabecera de página */
+.page-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px 30px;
+    background: #fff;
+    border-bottom: 1px solid #ddd;
+}
+
+/* Tabla Estilizada */
+.table-responsive { overflow-x: auto; }
+.table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 10px;
+}
+.table th, .table td {
+    text-align: left;
+    padding: 12px 15px;
+    border-bottom: 1px solid #eee;
+}
+.table th { background-color: #f8f9fa; color: #333; font-weight: 600; }
+
+/* Badges de Estado */
+.badge {
+    padding: 4px 8px;
+    border-radius: 12px;
+    font-size: 0.85rem;
+}
+.badge-success { background: #e6ffed; color: #28a745; border: 1px solid #28a745; }
+
+/* Botones y Modales */
+.btn-primary { background: #003366; color: white; border: none; padding: 10px 20px; border-radius: 4px; cursor: pointer; }
+.btn-icon { background: none; border: none; cursor: pointer; font-size: 1rem; margin: 0 5px; }
+.color-edit { color: #ffc107; }
+.color-delete { color: #dc3545; }
+
+/* CSS para el Modal */
+.modal {
+    display: none; position: fixed; z-index: 2000; left: 0; top: 0; 
+    width: 100%; height: 100%; background: rgba(0,0,0,0.5);
+}
+.modal-content {
+    background: white; margin: 10% auto; padding: 20px; 
+    width: 400px; border-radius: 8px;
+}
+.form-group { margin-bottom: 15px; }
+.form-group input, .form-group select {
+    width: 100%; padding: 8px; margin-top: 5px; border: 1px solid #ccc; border-radius: 4px;
+}

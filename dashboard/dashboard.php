@@ -9,7 +9,7 @@
 </head>
 <body>
 
-    <!-- ===== TOP BAR ===== -->
+    <!-- ===== SECCION DE TOP BAR ===== -->
     <header class="topbar">
         <div class="topbar-left">
             <div class="topbar-logo">
@@ -49,7 +49,7 @@
                     <i class="fas fa-chevron-down"></i>
                 </div>
                 <div class="submenu">
-                    <a href="#">Usuarios</a>
+                    <a href="../usuarios/usuarios.php">Usuarios</a>
                     <a href="#">Permisos</a>
                     <a href="#">Datos de la empresa</a>
                 </div>
@@ -61,7 +61,7 @@
                     <i class="fas fa-chevron-down"></i>
                 </div>
                 <div class="submenu">
-                    <a href="planillas.php">Presentación y Pago de Planillas</a>
+                    <a href="../planillas/planillas.php">Presentación y Pago de Planillas</a>
                     <a href="#">Consulta y Pago de Planillas</a>
                     <a href="#">Consulta y Pago de Regularizaciones</a>
                     <a href="#">Pagos Pendientes de 2da firma</a>
@@ -74,8 +74,11 @@
                     <i class="fas fa-chevron-down"></i>
                 </div>
                 <div class="submenu">
-                    <a href="afiliados.php">Consultar afiliados</a>
-                    <a href="#">Afiliar trabajadores al SPP</a>
+                    <a href="../afiliados/afiliados.php" class="act">Consulta de Afiliados Unitaria</a>
+                    <a href="../afiliados masivo/afiliados_masiva.php">Consulta de Afiliados Masiva</a>
+                    <a href="#">Afiliación Unitaria</a>
+                    <a href="#">Afiliación Masiva</a>
+                    <a href="#">Consulta de Solicitudes de Afiliación</a>
                 </div>
             </div>
 
@@ -141,7 +144,7 @@
                 <!-- Left Column -->
                 <div>
                     <!-- What you can do -->
-                    <div class="card" style="margin-bottom: 24px;">
+                    <div class="card" style="margin-bottom: 24px; ">
                         <div class="card-header">
                             A través de este módulo usted podrá realizar:
                         </div>
@@ -160,7 +163,7 @@
 
                     <!-- Guides -->
                     <div class="card">
-                        <div class="card-header orange">
+                        <div class="card-header">
                             Guías para el uso de AFPnet:
                         </div>
                         <div class="card-body">
@@ -198,6 +201,7 @@
     </main>
 
     <!-- ===== SCRIPTS ===== -->
-    <script src="dashboard.js"></script>
+    <script src="./dashboard.js"></script>
+    
 </body>
 </html>

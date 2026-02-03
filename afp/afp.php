@@ -3,13 +3,12 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AFPnet - Pago Fácil</title>
+    <title>AFPnet</title>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <link rel="stylesheet" href="afp.css">
 </head>
 <body>
-
-    <!-- ===== HERO ===== -->
+    <!-- ===== SECCION PRINCIPAL ===== -->
     <header class="hero">
         <div class="hero-container">
             <div class="sidebar-card">
@@ -95,7 +94,7 @@
         </div>
     </header>
 
-    <!-- ===== SERVICES ===== -->
+    <!-- ===== SECCION DE SERVICIOS ===== -->
     <section class="services">
         <h2>Un servicio gratuito</h2>
         <hr class="services-divider">
@@ -127,7 +126,7 @@
         </div>
     </section>
 
-    <!-- ===== ABOUT ===== -->
+    <!-- ===== SECCION DE ACERCA DE NOSOTROS ===== -->
     <section class="about">
         <div class="about-image"></div>
         <div class="about-text">
@@ -137,7 +136,7 @@
         </div>
     </section>
 
-    <!-- ===== AFP LOGOS ===== -->
+    <!-- ===== SECCION DE CLIENTES PRINCIPALES ===== -->
     <section class="afp-logos">
         <div class="afp-logos-grid">
             <a href="https://www.afphabitat.com.pe" target="_blank" class="afp-logo-item">
@@ -158,7 +157,7 @@
         </div>
     </section>
 
-    <!-- ===== CONTACT ===== -->
+    <!-- ===== SECCION DE CONTACTO ===== -->
     <section class="contact">
         <h2>Contáctanos</h2>
         <div class="contact-grid">
@@ -177,7 +176,7 @@
         </div>
     </section>
 
-    <!-- ===== CTA ===== -->
+    <!-- ===== SECCION DE REGISTRO ===== -->
     <section class="cta">
         <h4>¿Aún no tienes cuenta?</h4>
         <button class="btn-register">Registrate</button>
@@ -195,6 +194,6 @@
             <p class="footer-copy">© AFPnet - Asociación de AFP's.</p>
         </div>
     </footer>
-    <script src="afp.js"></script>
+    <script src="./afp.js"></script>
 </body>
 </html>

@@ -254,12 +254,13 @@ letter-spacing: 0.5px;
 /* Content Area */
 .content {
 padding: 24px 28px;
+
 }
 
 .content-subtitle {
 font-size: 16px;
 font-weight: 600;
-color: var(--text-dark);
+color: var(--blue-dark);
 margin-bottom: 20px;
 }
 
