@@ -1,3 +1,4 @@
+<link rel="stylesheet" href="../inicio/inicio.css">
 <aside class="sidebar" id="sidebar">
         <nav class="sidebar-nav">
             <div class="nav-item">
@@ -12,7 +13,7 @@
                     <i class="fas fa-chevron-down"></i>
                 </div>
                 <div class="submenu">
-                    <a href="/administracion/usuarios/usuarios.php">Usuarios</a>
+                    <a href="/AFP/administracion/usuarios/usuarios.php">Usuarios</a>
                     <a href="#">Permisos</a>
                     <a href="#">Datos de la empresa</a>
                 </div>
@@ -24,7 +25,7 @@
                     <i class="fas fa-chevron-down"></i>
                 </div>
                 <div class="submenu">
-                    <a href="/aportes/presentacion_y_pago_de_planillas/presentacion_y_pago_de_planillas.php">Presentación y Pago de Planillas</a>
+                    <a href="/AFP/aportes/presentacion_y_pago_de_planillas/presentacion_y_pago_de_planillas.php">Presentación y Pago de Planillas</a>
                     <a href="#">Consulta y Pago de Planillas</a>}
                     <a href="#">Consulta y Pago de Regularizaciones</a>
                     <a href="#">Pagos Pendientes de 2da firma</a>
@@ -37,11 +38,11 @@
                     <i class="fas fa-chevron-down"></i>
                 </div>
                 <div class="submenu">
-                    <a href="/afiliados/consulta_afiliados_unitaria/consulta_afiliados_unitaria.php" class="act">Consulta de Afiliados Unitaria</a>
-                    <a href="/afiliados/consulta_afiliados_masiva/consulta_afiliados_masiva.php">Consulta de Afiliados Masiva</a>
+                    <a href="/AFP/afiliados/consulta_afiliados_unitaria/consulta_afiliados_unitaria.php" class="act">Consulta de Afiliados Unitaria</a>
+                    <a href="/AFP/afiliados/consulta_afiliados_masiva/consulta_afiliados_masiva.php">Consulta de Afiliados Masiva</a>
                     <a href="#">Afiliación Unitaria</a>
-                    <a href="#">Afiliación Masiva</a>
-                    <a href="#">Consulta de Solicitudes de Afiliación</a>
+                    <a href="/AFP/afiliados/afiliacion_masiva/afiliacion_masiva.php">Afiliación Masiva</a>
+                    <a href="/AFP/afiliados/consulta_de_solicitudes_de_afiliados/consulta_de_solicitudes_de_afiliados.php">Consulta de Solicitudes de Afiliación</a>
                 </div>
             </div>
 
