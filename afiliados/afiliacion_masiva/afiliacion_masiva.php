@@ -35,7 +35,7 @@
 <!-- SIDEBAR -->
 <?php require "../../componentes/sidebar.php"; ?>
 
-<!-- MAIN -->
+<!-- CONTENIDO -->
 <main class="main" id="mc">
   <div class="page-banner"><span>AFILIADOS &gt;</span> AFILIACIÓN MASIVA</div>
 

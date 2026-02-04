@@ -2,8 +2,8 @@
 <aside class="sidebar" id="sidebar">
         <nav class="sidebar-nav">
             <div class="nav-item">
-                <div class="nav-link active" onclick="setActive(this)">
-                    <span><i class="fas fa-home" style="width:18px; margin-right:8px;"></i> Inicio</span>
+                <div class="nav-link active" onclick="location.href='/AFP/inicio/inicio.php'">
+                    <span><i  class="fas fa-home" style="width:18px; margin-right:8px;"></i> Inicio</span>
                 </div>
             </div>
 
@@ -40,8 +40,8 @@
                 <div class="submenu">
                     <a href="/AFP/afiliados/consulta_afiliados_unitaria/consulta_afiliados_unitaria.php" class="act">Consulta de Afiliados Unitaria</a>
                     <a href="/AFP/afiliados/consulta_afiliados_masiva/consulta_afiliados_masiva.php">Consulta de Afiliados Masiva</a>
-                    <a href="#">Afiliación Unitaria</a>
-                    <a href="/AFP/afiliados/afiliacion_masiva/afiliacion_masiva.php">Afiliación Masiva</a>
+                    <a href="/AFP/afiliados/afiliacion_unitaria/afiliacion_unitaria.php">Afiliación Unitaria</a>
+                    <a href="/AFP/afiliados/afiliacion_unitaria/afiliacion_unitaria.php">Afiliación Masiva</a>
                     <a href="/AFP/afiliados/consulta_de_solicitudes_de_afiliados/consulta_de_solicitudes_de_afiliados.php">Consulta de Solicitudes de Afiliación</a>
                 </div>
             </div>

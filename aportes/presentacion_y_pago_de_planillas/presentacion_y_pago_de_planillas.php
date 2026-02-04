@@ -24,15 +24,12 @@
         <div class="user-badge"><div class="user-avatar" id="u-init">U</div><span id="u-name">Usuario</span></div>
     </div>
 </header>
-
 <div class="sov" id="sov"></div>
-
 <!-- SIDEBAR -->
 <?php
     require "../../componentes/sidebar.php"
 ?>
-
-<!-- MAIN -->
+<!-- CONTENIDO -->
 <main class="main" id="mc">
     <div class="page-banner"><span>APORTES &gt;</span> PRESENTACIÓN Y PAGO DE PLANILLAS</div>
     <div class="content">
@@ -88,7 +85,6 @@
         </div>
     </div>
 </main>
-
 <!-- MODAL: EMITIR -->
 <div class="mo" id="mo-emit">
     <div class="modal">
@@ -97,7 +93,6 @@
         <div class="mf"><button class="btn btn-gray" onclick="closeM('mo-emit')">REGRESAR</button><button class="btn btn-blue" id="btn-do-emit">EMITIR TICKET</button></div>
     </div>
 </div>
-
 <!-- MODAL: TICKET EMITIDO -->
 <div class="mo" id="mo-ticket">
     <div class="modal">

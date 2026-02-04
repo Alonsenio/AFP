@@ -31,11 +31,10 @@
 </header>
 
 <div class="sov" id="sov"></div>
-
 <!-- SIDEBAR -->
 <?php require "../../componentes/sidebar.php"; ?>
 
-<!-- MAIN -->
+<!-- CONTENIDO -->
 <main class="main" id="mc">
   <div class="page-banner"><span>AFILIADOS &gt;</span> CONSULTA DE AFILIADOS MASIVA</div>
 
@@ -135,7 +134,6 @@
   </div>
 </main>
 
-<!-- SOLO SCRIPTS EXTERNOS (sin addEventListener en PHP) -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <script src="./consulta_afiliados_masiva.js"></script>
 </body>

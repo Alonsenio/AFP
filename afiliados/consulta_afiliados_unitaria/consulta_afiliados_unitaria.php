@@ -24,15 +24,12 @@
         <div class="user-badge"><div class="user-avatar" id="u-init">U</div><span id="u-name">Usuario</span></div>
     </div>
 </header>
-
 <div class="sov" id="sov"></div>
-
 <!-- SIDEBAR -->
 <?php
     require "../../componentes/sidebar.php"
 ?>
-
-<!-- MAIN -->
+<!-- CONTENIDO -->
 <main class="main" id="mc">
     <div class="page-banner"><span>AFILIADOS &gt;</span> CONSULTA DE AFILIADOS UNITARIA</div>
     <div class="content">

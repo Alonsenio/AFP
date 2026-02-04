@@ -6,10 +6,8 @@
     <title>AFPnet - Gestión de Usuarios</title>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <link rel="stylesheet" href="../../aportes/presentacion_y_pago_de_planillas/presentacion_y_pago_de_planillas.css">
-    
 </head>
 <body>
-
 <header class="topbar">
     <div class="topbar-left">
         <div class="topbar-logo" onclick="location.href='../../inicio/inicio.php'">AFPnet<span>PAGO FÁCIL</span></div>
@@ -20,14 +18,12 @@
         <div class="user-badge"><div class="user-avatar" id="u-init">U</div><span id="u-name">Usuario</span></div>
     </div>
 </header>
-
 <div class="sov" id="sov"></div>
-
 <!-- SIDEBAR -->
 <?php
     require "../../componentes/sidebar.php"
 ?>
-
+<!-- CONTENIDO -->
 <main class="main" id="mc">
     <div class="page-banner"><span>ADMINISTRACIÓN &gt;</span> GESTIÓN DE USUARIOS</div>
     <div class="content">
@@ -86,7 +82,7 @@
         </div>
     </div>
 </main>
-
+<!-- AGREGAR NUEVO USUARIO -->
 <div class="mo" id="mo-user">
     <div class="modal" style="max-width: 500px;">
         <div class="mh mh-blue">REGISTRAR NUEVO USUARIO<button class="mx" onclick="closeM('mo-user')"><i class="fas fa-times"></i></button></div>
@@ -113,7 +109,6 @@
         </div>
     </div>
 </div>
-
 <script src="./usuarios.js"></script>
 </body>
 </html>

@@ -27,7 +27,6 @@
                     <a href="#">REGISTRATE</a>
                 </nav>
             </div>
-
             <div class="login-card">
                 <h2 class="login-title">Iniciar Sesión</h2>
 
@@ -93,7 +92,6 @@
             </div>
         </div>
     </header>
-
     <!-- ===== SECCION DE SERVICIOS ===== -->
     <section class="services">
         <h2>Un servicio gratuito</h2>
@@ -125,7 +123,6 @@
             </div>
         </div>
     </section>
-
     <!-- ===== SECCION DE ACERCA DE NOSOTROS ===== -->
     <section class="about">
         <div class="about-image"></div>
@@ -135,7 +132,6 @@
             <p>El empleador sólo tiene que introducir un archivo (Excel o de texto) con los datos mínimos de sus trabajadores afiliados y AFPnet preparará las planillas de todas las AFP, colocando automáticamente a cada trabajador en la AFP que corresponde y calculando los aportes.</p>
         </div>
     </section>
-
     <!-- ===== SECCION DE CLIENTES PRINCIPALES ===== -->
     <section class="afp-logos">
         <div class="afp-logos-grid">
@@ -156,7 +152,6 @@
             </a>
         </div>
     </section>
-
     <!-- ===== SECCION DE CONTACTO ===== -->
     <section class="contact">
         <h2>Contáctanos</h2>
@@ -175,13 +170,11 @@
             </div>
         </div>
     </section>
-
     <!-- ===== SECCION DE REGISTRO ===== -->
     <section class="cta">
         <h4>¿Aún no tienes cuenta?</h4>
         <button class="btn-register">Registrate</button>
     </section>
-
     <!-- ===== FOOTER ===== -->
     <footer class="footer">
         <div class="footer-inner">

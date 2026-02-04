@@ -8,7 +8,6 @@
     <link rel="stylesheet" href="./inicio.css">
 </head>
 <body>
-
     <!-- ===== SECCION DE TOP BAR ===== -->
     <header class="topbar">
         <div class="topbar-left">
@@ -30,24 +29,17 @@
             </div>
         </div>
     </header>
-
-    <!-- ===== SIDEBAR OVERLAY ===== -->
-    <div class="sidebar-overlay" id="sidebar-overlay"></div>
-
     <!-- ===== SIDEBAR ===== -->
     <?php
         require "../componentes/sidebar.php"
     ?>
-
-    <!-- ===== MAIN CONTENT ===== -->
+    <!-- ===== CONTENIDO ===== -->
     <main class="main" id="main-content">
         <div class="page-banner">
             BIENVENIDO AL PORTAL DE LA ASOCIACIÓN DE AFP
         </div>
-
         <div class="content">
             <p class="content-subtitle">Usted ha ingresado al módulo de Empleador</p>
-
             <div class="dashboard-grid">
                 <!-- Left Column -->
                 <div>

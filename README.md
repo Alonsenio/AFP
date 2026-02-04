@@ -1,9 +1,10 @@
-"LISTA DE MODULOS REALIZADOS"
+"EXPLICACION DE FUNCIONAMIENTO DE CADA MODULO"
 ->  LOGIN:
+    ----USUARIOS PRUEBA---
     USUARIO 1
     ruc: '12345678910'
     user: 'alonso'
-    pass: '123456'
+    pass: '12345678910'
     USUARIO 2
     ruc: '20987654321'
     user: 'gustavo'
@@ -17,7 +18,7 @@
 ->  CONSULTA DE AFILIADOS UNITARIA:
     paso 1: ingresar datos del usuario
     paso 2: boton buscar 
-
+    ----USUARIOS PRUEBA---
     USUARIO 1
     tipodoc:'DNI'
     numdoc:'10379368'
@@ -38,14 +39,18 @@
     {tipodoc:'DNI',numdoc:'11223344',appat:'QUISPE',apmat:'MAMANI',nombres:'JUAN CARLOS',cuspp:'511223JCQMA3',devmax:'2026-02',motivo:'',afp:'PRIMA',tipocom:'Flujo',pctcom:'1.69%'},
     {tipodoc:'DNI',numdoc:'99887766',appat:'FLORES',apmat:'DIAZ',nombres:'ROSA MARIA',cuspp:'599887RMFLD7',devmax:'2025-11',motivo:'Jubilación anticipada',afp:'HABITAT',tipocom:'Mixta',pctcom:'1.47%'},
     {tipodoc:'PAS',numdoc:'PA445566',appat:'VARGAS',apmat:'CASTRO',nombres:'DIEGO FERNANDO',cuspp:'644556DFVCA5',devmax:'2026-01',motivo:'',afp:'PROFUTURO',tipocom:'Flujo',pctcom:'1.69%'},
+->  AFILIACION MASIVA
+    paso 1: subir archivo "Carga_Masiva_Ejemplo_1.xls"
 ->  CONSULTA DE AFILIADOS MASIVA:
     paso 1: colocar  periodo de desvengue
     paso 2: subir archivo Consulta_CUSPP_Masiva_Ejemplo-1.xls
     paso 3: colocar captcha
     paso 4: boton procesar 
-->  afiliacion Masiva
-    paso 1: subir archivo "Carga_Masiva_Ejemplo_1.xls"
-    paso 2:
+-> AFILIACION UNITARIA 
+    En proceso...
+    
+
+    
 
 
 
