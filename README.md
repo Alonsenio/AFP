@@ -1,7 +1,7 @@
 "LISTA DE MODULOS REALIZADOS"
 ->  LOGIN:
     USUARIO 1
-    ruc: '20123456789'
+    ruc: '12345678910'
     user: 'alonso'
     pass: '123456'
     USUARIO 2
@@ -36,6 +36,11 @@
     {tipodoc:'PAS',numdoc:'PA445566',appat:'VARGAS',apmat:'CASTRO',nombres:'DIEGO FERNANDO',cuspp:'644556DFVCA5',devmax:'2026-01',motivo:'',afp:'PROFUTURO',tipocom:'Flujo',pctcom:'1.69%'},
 ->  CONSULTA DE AFILIADOS MASIVA:
     En proceso...
+
+
+     
+    
+    
 
     
 

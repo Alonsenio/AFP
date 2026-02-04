@@ -5,14 +5,14 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>AFPnet - Consulta de Afiliados Unitaria</title>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="afiliados.css">
+    <link rel="stylesheet" href="./consulta_afiliados_unitaria.css">
 </head>
 <body>
 
 <!-- TOPBAR -->
 <header class="topbar">
     <div class="topbar-left">
-        <div class="topbar-logo" onclick="location.href='../dashboard/dashboard.php'">AFPnet<span>PAGO FÁCIL</span></div>
+        <div class="topbar-logo" onclick="location.href='../../inicio/inicio.php'">AFPnet<span>PAGO FÁCIL</span></div>
         <button class="btn-menu" id="btn-tog"><i class="fas fa-bars"></i></button>
         <div class="topbar-info">
             <span class="ruc" id="tb-ruc">20100000001</span> - <span id="tb-razon">EMPRESA</span><br>
@@ -28,44 +28,9 @@
 <div class="sov" id="sov"></div>
 
 <!-- SIDEBAR -->
-<aside class="sidebar" id="sb">
-    <nav class="sidebar-nav">
-        <div><a class="nav-link" href="../dashboard/dashboard.php"><span><i class="fas fa-home" style="width:18px;margin-right:8px"></i> Inicio</span></a></div>
-        <div>
-            <div class="nav-link" onclick="togSub(this)"><span><i class="fas fa-cogs" style="width:18px;margin-right:8px"></i> Administración</span><i class="fas fa-chevron-down chv"></i></div>
-            <div class="submenu"><a href="../usuarios/usuarios.php">Usuarios</a><a href="#">Permisos</a><a href="#">Datos de la empresa</a></div>
-        </div>
-        <div>
-            <div class="nav-link" onclick="togSub(this)"><span><i class="fas fa-file-invoice-dollar" style="width:18px;margin-right:8px"></i> Aportes</span><i class="fas fa-chevron-down chv"></i></div>
-            <div class="submenu"><a href="../planillas/planillas.php">Presentación y Pago de Planillas</a><a href="#">Consulta y Pago de Planillas</a><a href="#">Consulta y Pago de Regularizaciones</a><a href="#">Pagos Pendientes de 2da firma</a></div>
-        </div>
-        <div>
-            <div class="nav-link active open" onclick="togSub(this)"><span><i class="fas fa-users" style="width:18px;margin-right:8px"></i> Afiliados</span><i class="fas fa-chevron-down chv"></i></div>
-            <div class="submenu open">
-                <a href="../afiliados/afiliados.php" class="act">Consulta de Afiliados Unitaria</a>
-                <a href="#">Consulta de Afiliados Masiva</a>
-                <a href="#">Afiliación Unitaria</a>
-                <a href="#">Afiliación Masiva</a>
-                <a href="#">Consulta de Solicitudes de Afiliación</a>
-            </div>
-        </div>
-        <div>
-            <div class="nav-link" onclick="togSub(this)"><span><i class="fas fa-clipboard-list" style="width:18px;margin-right:8px"></i> Módulo REPRO</span><i class="fas fa-chevron-down chv"></i></div>
-            <div class="submenu"><a href="#">Consultas</a><a href="#">Reportes</a></div>
-        </div>
-        <div>
-            <div class="nav-link" onclick="togSub(this)"><span><i class="fas fa-money-check-alt" style="width:18px;margin-right:8px"></i> Obligaciones de Pago</span><i class="fas fa-chevron-down chv"></i></div>
-            <div class="submenu"><a href="#">Ver obligaciones</a><a href="#">Historial de pagos</a></div>
-        </div>
-        <div>
-            <div class="nav-link" onclick="togSub(this)"><span><i class="fas fa-exclamation-triangle" style="width:18px;margin-right:8px"></i> Deudas Ciertas y Presuntas</span><i class="fas fa-chevron-down chv"></i></div>
-            <div class="submenu"><a href="#">Liquidaciones</a><a href="#">Descargos de cobranza</a></div>
-        </div>
-        <div class="nav-sep"></div>
-        <div><a class="nav-link" href="#"><span><i class="fas fa-key" style="width:18px;margin-right:8px"></i> Cambiar Contraseña</span></a></div>
-        <div><div class="nav-link nav-danger" onclick="cerrarSesion()"><span><i class="fas fa-sign-out-alt" style="width:18px;margin-right:8px"></i> Cerrar Sesión</span></div></div>
-    </nav>
-</aside>
+<?php
+    require "../../componentes/sidebar.php"
+?>
 
 <!-- MAIN -->
 <main class="main" id="mc">
@@ -159,6 +124,6 @@
 
     </div>
 </main>
-<script src="./afiliados.js"></script>
+<script src="./consulta_afiliados_unitaria.js"></script>
 </body>
 </html>

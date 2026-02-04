@@ -8,14 +8,14 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
-    <link rel="stylesheet" href="planillas.css">
+    <link rel="stylesheet" href="./presentacion_y_pago_de_planillas.css">
 </head>
 <body>
 
 <!-- TOPBAR -->
 <header class="topbar">
     <div class="topbar-left">
-        <div class="topbar-logo" onclick="location.href='../dashboard/dashboard.php'">AFPnet<span>PAGO FÁCIL</span></div>
+        <div class="topbar-logo" onclick="location.href='../../inicio/inicio.php'">AFPnet<span>PAGO FÁCIL</span></div>
         <button class="btn-menu" id="btn-tog"><i class="fas fa-bars"></i></button>
         <div class="topbar-welcome">Bienvenido Sr(a). <strong id="w-name">Usuario</strong></div>
     </div>
@@ -28,38 +28,9 @@
 <div class="sov" id="sov"></div>
 
 <!-- SIDEBAR -->
-<aside class="sidebar" id="sb">
-    <nav class="sidebar-nav">
-        <div><a class="nav-link" href="../dashboard/dashboard.php"><span><i class="fas fa-home" style="width:18px;margin-right:8px"></i> Inicio</span></a></div>
-        <div>
-            <div class="nav-link" onclick="togSub(this)"><span><i class="fas fa-cogs" style="width:18px;margin-right:8px"></i> Administración</span><i class="fas fa-chevron-down chv"></i></div>
-            <div class="submenu"><a href="../usuarios/usuarios.php">Usuarios</a><a href="#">Permisos</a><a href="#">Datos de la empresa</a></div>
-        </div>
-        <div>
-            <div class="nav-link active open" onclick="togSub(this)"><span><i class="fas fa-file-invoice-dollar" style="width:18px;margin-right:8px"></i> Aportes</span><i class="fas fa-chevron-down chv"></i></div>
-            <div class="submenu open"><a href="../planillas/planillas.php" class="act">Presentación y Pago de Planillas</a><a href="#">Consulta y Pago de Planillas</a><a href="#">Consulta y Pago de Regularizaciones</a><a href="#">Pagos Pendientes de 2da firma</a></div>
-        </div>
-        <div>
-            <div class="nav-link" onclick="togSub(this)"><span><i class="fas fa-users" style="width:18px;margin-right:8px"></i> Afiliados</span><i class="fas fa-chevron-down chv"></i></div>
-            <div class="submenu"><a href="../afiliados/afiliados.php">Consultar afiliados</a><a href="#">Afiliar trabajadores al SPP</a></div>
-        </div>
-        <div>
-            <div class="nav-link" onclick="togSub(this)"><span><i class="fas fa-clipboard-list" style="width:18px;margin-right:8px"></i> Módulo REPRO</span><i class="fas fa-chevron-down chv"></i></div>
-            <div class="submenu"><a href="#">Consultas</a><a href="#">Reportes</a></div>
-        </div>
-        <div>
-            <div class="nav-link" onclick="togSub(this)"><span><i class="fas fa-money-check-alt" style="width:18px;margin-right:8px"></i> Obligaciones de Pago</span><i class="fas fa-chevron-down chv"></i></div>
-            <div class="submenu"><a href="#">Ver obligaciones</a><a href="#">Historial de pagos</a></div>
-        </div>
-        <div>
-            <div class="nav-link" onclick="togSub(this)"><span><i class="fas fa-exclamation-triangle" style="width:18px;margin-right:8px"></i> Deudas Ciertas y Presuntas</span><i class="fas fa-chevron-down chv"></i></div>
-            <div class="submenu"><a href="#">Liquidaciones</a><a href="#">Descargos de cobranza</a></div>
-        </div>
-        <div class="nav-sep"></div>
-        <div><a class="nav-link" href="#"><span><i class="fas fa-key" style="width:18px;margin-right:8px"></i> Cambiar Contraseña</span></a></div>
-        <div><div class="nav-link nav-danger" onclick="cerrarSesion()"><span><i class="fas fa-sign-out-alt" style="width:18px;margin-right:8px"></i> Cerrar Sesión</span></div></div>
-    </nav>
-</aside>
+<?php
+    require "../../componentes/sidebar.php"
+?>
 
 <!-- MAIN -->
 <main class="main" id="mc">
@@ -135,6 +106,6 @@
         <div class="mf"><button class="btn btn-gray" onclick="closeM('mo-ticket')">REGRESAR</button><button class="btn btn-blue" id="btn-print"><i class="fas fa-print"></i> IMPRIMIR TICKET</button></div>
     </div>
 </div>
-<script src="./planillas.js"></script>
+<script src="./presentacion_y_pago_de_planillas.js"></script>
 </body>
 </html>

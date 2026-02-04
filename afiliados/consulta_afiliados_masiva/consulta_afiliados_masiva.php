@@ -31,13 +31,10 @@ $usuario = $_SESSION['afpnet_usuario'] ?? 'Usuario';
     </div>
 </div>
 
-<!-- SIDEBAR (reutilizada) -->
-<div class="sidebar" id="sb">
-    <div class="sidebar-nav">
-        <div class="nav-link">Inicio</div>
-        <div class="nav-link active">Consulta de Afiliados Masiva</div>
-    </div>
-</div>
+<!-- SIDEBAR -->
+<?php
+    require "../../componentes/sidebar.php"
+?>
 
 <div class="sov" id="sov"></div>
 
@@ -88,7 +85,7 @@ $usuario = $_SESSION['afpnet_usuario'] ?? 'Usuario';
     </div>
 </div>
 
-<script src="afiliados_masiva.js"></script>
+<script src="./consulta_afiliados_masiva.js"></script>
 <script>
 /* reloj igual al unitario */
 function updClk(){

@@ -1,11 +1,11 @@
 // 1. Base de datos simulada de usuarios
 const USUARIOS_VALIDOS = [
-    { ruc: '20123456789', user: 'alonso', pass: '123456', nombre: 'Alonso Lucas', perfil: 'Administrador' },
-    { ruc: '20123456789', user: 'elder', pass: '123456', nombre: 'Elder Alejandro', perfil: 'Operador' },
-    { ruc: '20123456789', user: 'pooul', pass: '123456', nombre: 'Pooul Garcia', perfil: 'Operador' },
-    { ruc: '20123456789', user: 'anthony', pass: '123456', nombre: 'Anthony Quispe', perfil: 'Administrador' },
-    { ruc: '20987654321', user: 'gustavo', pass: '123456', nombre: 'Gustavo Adolfo', perfil: 'Administrador' },
-    { ruc: '20987654321', user: 'angel', pass: '123456', nombre: 'Angel Rodriguez', perfil: 'Operador' },
+    { ruc: '12345678910', user: 'alonso', pass: '12345678910', nombre: 'Alonso Lucas', perfil: 'Administrador' },
+    { ruc: '12345678910', user: 'elder', pass: '123456', nombre: 'Elder Alejandro', perfil: 'Operador' },
+    { ruc: '12345678910', user: 'pooul', pass: '123456', nombre: 'Pooul Garcia', perfil: 'Operador' },
+    { ruc: '12345678910', user: 'anthony', pass: '123456', nombre: 'Anthony Quispe', perfil: 'Administrador' },
+    { ruc: '12345678910', user: 'gustavo', pass: '123456', nombre: 'Gustavo Adolfo', perfil: 'Administrador' },
+    { ruc: '12345678910', user: 'angel', pass: '123456', nombre: 'Angel Rodriguez', perfil: 'Operador' },
     { ruc: '20987654321', user: 'maria', pass: '123456', nombre: 'Maria Flores', perfil: 'Operador' },
     { ruc: '20554433221', user: 'admin', pass: 'admin123', nombre: 'Administrador Sistema', perfil: 'Administrador' },
     { ruc: '20554433221', user: 'soporte', pass: 'soporte123', nombre: 'Soporte Tecnico', perfil: 'Operador' }
@@ -83,5 +83,5 @@ document.getElementById('frm-login-empleador').addEventListener('submit', functi
     btn.innerHTML = 'INGRESANDO...';
     btn.disabled = true;
 
-    setTimeout(() => { window.location.href = '../dashboard/dashboard.php'; }, 1000);
+    setTimeout(() => { window.location.href = '../inicio/inicio.php'; }, 1000);
 });

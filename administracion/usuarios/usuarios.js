@@ -1,9 +1,9 @@
 // Red de seguridad: Datos por defecto si el localStorage falla
 const DATA_BACKUP = [
-    { ruc: '20123456789', user: 'alonso', nombre: 'Alonso Lucas', perfil: 'Administrador' },
-    { ruc: '20123456789', user: 'elder', nombre: 'Elder Alejandro', perfil: 'Operador' },
-    { ruc: '20123456789', user: 'mgarcia', nombre: 'Maria Garcia', perfil: 'Operador' },
-    { ruc: '20123456789', user: 'jquispe', nombre: 'Juan Quispe', perfil: 'Administrador' },
+    { ruc: '12345678910', user: 'alonso', nombre: 'Alonso Lucas', perfil: 'Administrador' },
+    { ruc: '12345678910', user: 'elder', nombre: 'Elder Alejandro', perfil: 'Operador' },
+    { ruc: '12345678910', user: 'mgarcia', nombre: 'Maria Garcia', perfil: 'Operador' },
+    { ruc: '12345678910', user: 'jquispe', nombre: 'Juan Quispe', perfil: 'Administrador' },
     { ruc: '20987654321', user: 'gustavo', nombre: 'Gustavo Adolfo', perfil: 'Administrador' },
     { ruc: '20987654321', user: 'lrodriguez', nombre: 'Lucia Rodriguez', perfil: 'Operador' },
     { ruc: '20987654321', user: 'cflores', nombre: 'Carlos Flores', perfil: 'Operador' }
@@ -18,7 +18,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
 function loadUserData() {
     if (!sessionStorage.getItem('afpnet_sesion')) {
-        window.location.href = '../afp/afp.php';
+        window.location.href = '../../login/login.php';
         return;
     }
     const ruc = sessionStorage.getItem('afpnet_ruc');
@@ -107,5 +107,5 @@ function closeM(id) { document.getElementById(id).classList.remove('vis'); }
 
 function cerrarSesion() {
     sessionStorage.clear();
-    window.location.href = '../afp/afp.php';
+    window.location.href = '../../login/login.php';
 }
