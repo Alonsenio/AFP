@@ -29,9 +29,12 @@
     </div>
   </div>
 </header>
+
 <div class="sov" id="sov"></div>
+
 <!-- SIDEBAR -->
 <?php require "../../componentes/sidebar.php"; ?>
+
 <!-- CONTENIDO -->
 <main class="main" id="mc">
   <div class="page-banner"><span>AFILIADOS &gt;</span> AFILIACIÓN MASIVA</div>
@@ -43,7 +46,7 @@
       <ul class="info-list">
         <li>Descargue el modelo para la afiliación masiva para Empresa <a href="#" id="lnk-modelo">Aquí</a></li>
         <li>Tipos permitidos: <strong>txt, xls, xlsx, csv</strong></li>
-        <li>El sistema guardará los registros en un <strong>array</strong> y lo almacenará en <strong>localStorage</strong> para consultas posteriores.</li>
+        <li>El sistema guardará los registros por <strong>lotes</strong> y lo almacenará en <strong>localStorage</strong> para consultas posteriores.</li>
       </ul>
     </div>
 
@@ -57,7 +60,7 @@
           <input type="file" id="file" class="file"
                  accept=".xlsx,.xls,.csv,.txt,application/vnd.ms-excel,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,text/csv,text/plain">
         </div>
-        <div class="hint">Ejemplo de fila: 10379368 | Nevardo Alcides | Alzamora | Lara | 04/09/1974 | neal_tato@hotmail.com | 5436505 | 954778576 | 15316 | Jr | San Antonio 452 | ... | 0</div>
+        <div class="hint">Ejemplo (TXT): 10379368 | Nevardo Alcides | Alzamora | Lara | 04/09/1974 | correo@ | fijo | movil | ubigeo | Jr | San Antonio 452 | ... | 0</div>
       </div>
 
       <div class="btn-row">
@@ -68,10 +71,18 @@
       </div>
     </div>
 
+    <!-- RESULTS -->
     <div class="results" id="results">
       <div class="results-head">
         <p class="results-count" id="res-count"></p>
-        <div class="results-actions">
+
+        <!-- Badge para mostrar el código sí o sí -->
+        <div style="margin-top:8px;font-size:13px;">
+          <strong>Código de Carga:</strong>
+          <span id="cod-carga-view" style="display:inline-block;padding:4px 10px;border-radius:10px;background:#e8edf8;color:#1c3997;font-weight:800;">-</span>
+        </div>
+
+        <div class="results-actions" style="margin-top:14px;">
           <button class="btn btn-blue" id="btn-export" type="button"><i class="fas fa-file-excel"></i> DESCARGAR EXCEL</button>
           <button class="btn btn-gray" id="btn-clear" type="button"><i class="fas fa-trash"></i> LIMPIAR GUARDADO</button>
         </div>
@@ -82,6 +93,7 @@
           <table>
             <thead>
               <tr>
+                <th>Código Carga</th>
                 <th>Nro Documento</th>
                 <th>Nombres</th>
                 <th>Apellido Paterno</th>
@@ -105,7 +117,7 @@
       </div>
 
       <div class="note">
-        Se guardó en: <code>localStorage["afpnet_afiliacion_masiva"]</code>
+        Se guardó en: <code>localStorage["afpnet_afiliacion_masiva_batches"]</code>
       </div>
     </div>
 

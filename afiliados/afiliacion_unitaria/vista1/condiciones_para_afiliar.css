@@ -52,7 +52,8 @@ a{text-decoration:none;color:inherit}
 .content{padding:24px 28px}
 
 /* SEARCH CARD */
-.search-card{background:var(--cyan);border:1px solid #b2ebf2;border-radius:8px;padding:28px 32px;margin-bottom:24px;box-shadow:0 1px 4px rgba(0,0,0,.06)}
+/* SEARCH CARD */
+.search-card{background:var(--white);border-radius:8px;padding:28px 32px;margin-bottom:24px;box-shadow:0 1px 4px rgba(0,0,0,.06)}
 
 /* Radio options */
 .search-option{display:flex;align-items:center;gap:16px;margin-bottom:20px;flex-wrap:wrap;min-height:38px}

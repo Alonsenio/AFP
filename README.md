@@ -47,7 +47,10 @@
     paso 3: colocar captcha
     paso 4: boton procesar 
 -> AFILIACION UNITARIA 
-    En proceso...
+    paso 1:  marca las casillas segun corresponda
+    paso 2:  buscar persona a afliar segun el docuemnto 
+    paso 3: llenar campos faltantes para concluir afiliacion 
+            
     
 
     

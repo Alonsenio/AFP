@@ -33,11 +33,9 @@
 <main class="main" id="mc">
     <div class="page-banner"><span>AFILIADOS &gt;</span> CONSULTA DE AFILIADOS UNITARIA</div>
     <div class="content">
-
         <!-- SEARCH FORM -->
         <div class="search-card">
             <div class="msg msg-err" id="m-err"><i class="fas fa-exclamation-circle"></i><span id="m-err-t"></span></div>
-
             <!-- Option 1: CUSPP -->
             <div class="search-option">
                 <label class="radio-label">

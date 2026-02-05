@@ -33,12 +33,10 @@
 <main class="main" id="mc">
     <div class="page-banner"><span>AFILIADOS &gt;</span> CONSULTA DE AFILIADOS UNITARIA</div>
     <div class="content">
-
         <!-- SEARCH FORM -->
         <div class="search-card">
             <div class="msg msg-err" id="m-err"><i class="fas fa-exclamation-circle"></i><span id="m-err-t"></span></div>
 
-            <!-- Option 2: Tipo Documento -->
             <div class="search-option">
                 <label class="radio-label">
                     <input type="radio" name="search-type" value="documento" id="r-doc" checked>
@@ -90,6 +88,14 @@
         </div>
 
     </div>
+
+    <div class="btn-row">
+        <button class="btn btn-blue" id="btn-continuar">
+            <i class="fas fa-arrow-right"></i> CONTINUAR
+        </button>
+    </div>
+
+
 </main>
 <script src="./buscar_trabajador.js"></script>
 </body>

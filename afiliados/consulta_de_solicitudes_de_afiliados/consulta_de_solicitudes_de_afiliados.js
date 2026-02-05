@@ -1,5 +1,7 @@
+// consulta_de_solicitudes_de_afiliados.js
+
 // =====================
-// Helpers safe
+// Helpers
 // =====================
 function $(id){ return document.getElementById(id); }
 function on(id, evt, fn){
@@ -8,7 +10,9 @@ function on(id, evt, fn){
   el.addEventListener(evt, fn);
 }
 
-// Stubs sidebar
+// =====================
+// Stubs sidebar.php
+// =====================
 function setActive(){}
 function togSub(el){
   const sub=el?.nextElementSibling; if(!sub) return;
@@ -29,9 +33,9 @@ const uName = sessionStorage.getItem('afpnet_nombre') || sessionStorage.getItem(
 const uPerfil = 'Administrador';
 
 // =====================
-// Storage
+// STORAGE KEY — debe ser la misma que usa afiliacion_masiva.js
 // =====================
-const STORAGE_KEY = 'afpnet_afiliacion_masiva';
+const BATCHES_KEY = 'afpnet_afiliacion_masiva_batches';
 
 // =====================
 // INIT
@@ -53,12 +57,13 @@ window.addEventListener('DOMContentLoaded', () => {
   on('btn-descargar','click', onDescargar);
   on('btn-guia','click', () => alert('Aquí abrirás tu guía de uso.'));
 
-  // init view
   hideTable();
-  setMsg('No se encontraron resultados en la búsqueda.');
+  setMsg('Ingrese un Código de Carga Masiva y presione BUSCAR para consultar los estados.');
+
+  // Si hay batches, mostrar los códigos disponibles como ayuda
+  mostrarCodigosDisponibles();
 });
 
-// =====================
 function updClk(){
   if(!$('tb-time')) return;
   const n = new Date();
@@ -93,12 +98,11 @@ function showOK(m){ hideE(); $('m-ok-t') && ($('m-ok-t').textContent=m); $('m-ok
 function hideOK(){ $('m-ok')?.classList.remove('vis'); }
 
 // =====================
-// Mode enable/disable
+// Mode enable/disable (doc vs nombres)
 // =====================
 function setupMode(){
   const setMode = () => {
     const mode = document.querySelector('input[name="modo"]:checked')?.value || 'doc';
-
     const docOn = mode === 'doc';
     const nomOn = mode === 'nom';
 
@@ -123,7 +127,6 @@ function setupMode(){
   document.querySelectorAll('input[name="modo"]').forEach(r => r.addEventListener('change', setMode));
   setMode();
 
-  // solo numeros si es DNI
   on('inp-numdoc','input', function(){
     const tipo = $('sel-tipodoc')?.value || '';
     if(!tipo || tipo === 'DNI'){
@@ -133,53 +136,8 @@ function setupMode(){
 }
 
 // =====================
-// Load data from afiliacion masiva and create "solicitudes"
+// Utils
 // =====================
-function loadBase(){
-  try{
-    const raw = localStorage.getItem(STORAGE_KEY);
-    if(!raw) return [];
-    const arr = JSON.parse(raw);
-    if(!Array.isArray(arr)) return [];
-    return arr;
-  }catch(_){ return []; }
-}
-
-// Para esta pantalla: generamos campos de solicitud (simulados) pero estables
-function toSolicitudes(baseArr){
-  return baseArr.map((r, idx) => {
-    // En afiliación masiva no guardaste tipo doc, entonces lo asumimos DNI
-    const tipodoc = r.tipodoc || 'DNI';
-
-    // codigo carga: si viene, usa; si no, genera uno estable por idx
-    const codigo_carga = r.codigo_carga || `CM-${new Date().getFullYear()}-${String(idx+1).padStart(4,'0')}`;
-
-    // estados: si vienen, usa; sino asigna por patrón
-    const estados = ['REGISTRADA','OBSERVADA','APROBADA','RECHAZADA'];
-    const preest = ['SIN_PRE','PRE_REGISTRADA','PRE_OBSERVADA'];
-
-    const estado_solicitud = r.estado_solicitud || estados[idx % estados.length];
-    const estado_pre = r.estado_pre || preest[idx % preest.length];
-
-    return {
-      codigo_carga,
-      estado_solicitud,
-      estado_pre,
-      tipodoc,
-      nro_documento: String(r.nro_documento || '').trim(),
-      apellido_paterno: String(r.apellido_paterno || '').trim(),
-      apellido_materno: String(r.apellido_materno || '').trim(),
-      nombres: String(r.nombres || '').trim(),
-      ruc: String(r.ruc || '').trim(),
-      razon_social: String(r.razon_social || '').trim(),
-      usuario_agente: String(r.usuario_agente || '').trim(),
-      origen_onp: String(r.origen_onp || '').trim(),
-      fecha_nacimiento: String(r.fecha_nacimiento || '').trim(),
-      mail_principal: String(r.mail_principal || '').trim(),
-    };
-  });
-}
-
 function norm(s){ return String(s||'').trim().toUpperCase().replace(/\s+/g,' '); }
 function esc(s){
   return String(s ?? '').replace(/[&<>"']/g, m => ({
@@ -188,7 +146,98 @@ function esc(s){
 }
 
 // =====================
-// Search
+// Colores para badges de estado
+// =====================
+function badgeEstado(estado){
+  const colors = {
+    'REGISTRADA':  { bg:'#e8f0fe', color:'#1a56db', border:'#93b4f5' },
+    'OBSERVADA':   { bg:'#fef3cd', color:'#856404', border:'#f0d77c' },
+    'APROBADA':    { bg:'#d4edda', color:'#155724', border:'#82cfab' },
+    'RECHAZADA':   { bg:'#f8d7da', color:'#721c24', border:'#f1a7ad' },
+  };
+  const c = colors[estado] || { bg:'#f0f0f0', color:'#333', border:'#ccc' };
+  return `<span style="display:inline-block;padding:2px 10px;border-radius:12px;font-size:11px;font-weight:700;
+    background:${c.bg};color:${c.color};border:1px solid ${c.border}">${esc(estado || '-')}</span>`;
+}
+
+function badgeEstadoPre(estado){
+  const colors = {
+    'SIN_PRE':        { bg:'#f0f0f0', color:'#666', border:'#ccc' },
+    'PRE_REGISTRADA': { bg:'#e8f0fe', color:'#1a56db', border:'#93b4f5' },
+    'PRE_OBSERVADA':  { bg:'#fef3cd', color:'#856404', border:'#f0d77c' },
+  };
+  const c = colors[estado] || { bg:'#f0f0f0', color:'#333', border:'#ccc' };
+  const label = (estado || '-').replace(/_/g,' ');
+  return `<span style="display:inline-block;padding:2px 10px;border-radius:12px;font-size:11px;font-weight:700;
+    background:${c.bg};color:${c.color};border:1px solid ${c.border}">${esc(label)}</span>`;
+}
+
+// =====================
+// Leer batches desde localStorage (misma key que afiliacion_masiva)
+// =====================
+function loadBatches(){
+  try{
+    const raw = localStorage.getItem(BATCHES_KEY);
+    if(!raw) return [];
+    const parsed = JSON.parse(raw);
+    return Array.isArray(parsed) ? parsed : [];
+  }catch(_){ return []; }
+}
+
+// =====================
+// Aplanar batches → solicitudes individuales con estado por persona
+// =====================
+function buildSolicitudes(batches){
+  const out = [];
+  batches.forEach(batch => {
+    const codigo = batch.codigo_carga || '';
+    (batch.registros || []).forEach(r => {
+      out.push({
+        codigo_carga:     r.codigo_carga || codigo,
+        estado_solicitud: r.estado_solicitud || batch.estado_solicitud || 'REGISTRADA',
+        estado_pre:       r.estado_pre || batch.estado_pre || 'SIN_PRE',
+        tipodoc:          r.tipodoc || 'DNI',
+        nro_documento:    String(r.nro_documento || '').trim(),
+        apellido_paterno: String(r.apellido_paterno || '').trim(),
+        apellido_materno: String(r.apellido_materno || '').trim(),
+        nombres:          String(r.nombres || '').trim(),
+        ruc:              String(r.ruc || batch.ruc || '').trim(),
+        razon_social:     String(r.razon_social || batch.razon_social || '').trim(),
+        usuario_agente:   String(r.usuario_agente || batch.usuario_agente || '').trim(),
+        origen_onp:       String(r.origen_onp || '').trim(),
+        fecha_nacimiento: String(r.fecha_nacimiento || '').trim(),
+        mail_principal:   String(r.mail_principal || '').trim(),
+      });
+    });
+  });
+  return out;
+}
+
+// =====================
+// Mostrar códigos disponibles como ayuda visual
+// =====================
+function mostrarCodigosDisponibles(){
+  const batches = loadBatches();
+  if(batches.length === 0) return;
+
+  const codigos = batches.map(b => b.codigo_carga).filter(Boolean);
+  if(codigos.length === 0) return;
+
+  // Agregar hint debajo del campo de código
+  const hint = document.querySelector('#inp-cod-carga + .hint');
+  if(hint){
+    hint.innerHTML =
+      'Códigos disponibles: ' +
+      codigos.map(c =>
+        `<span class="cod-chip" style="display:inline-block;padding:2px 8px;margin:2px;border-radius:10px;
+          background:#e8edf8;color:#1c3997;font-weight:700;font-size:11px;cursor:pointer"
+          onclick="document.getElementById('inp-cod-carga').value='${esc(c)}'">${esc(c)}</span>`
+      ).join(' ');
+  }
+}
+
+// =====================
+// BUSCAR
 // =====================
 let lastResults = [];
 
@@ -201,34 +250,37 @@ function onBuscar(){
   btn?.classList.add('loading'); if(btn) btn.disabled = true;
 
   try{
-    const base = loadBase();
-    if(base.length === 0){
-      setMsg('No hay solicitudes guardadas. Primero carga un Excel en "Afiliación Masiva".');
-      showE('No se encontró data en localStorage para afiliación masiva.');
+    const batches = loadBatches();
+
+    if(batches.length === 0){
+      setMsg('No hay solicitudes guardadas. Primero realice una carga en "Afiliación Masiva".');
+      showE('No se encontró data. Vaya a Afiliación Masiva y cargue un archivo primero.');
       return;
     }
 
-    const data = toSolicitudes(base);
+    const data = buildSolicitudes(batches);
 
-    // filtros generales
+    // ===== Filtros =====
     const fEstadoSol = ($('sel-estado-sol')?.value || '').trim();
     const fEstadoPre = ($('sel-estado-pre')?.value || '').trim();
     const fCodCarga  = ($('inp-cod-carga')?.value || '').trim().toUpperCase();
 
     let filtered = data.filter(x => {
+      // Filtro por estado de solicitud
       if(fEstadoSol && x.estado_solicitud !== fEstadoSol) return false;
+      // Filtro por estado de pre-solicitud
       if(fEstadoPre && x.estado_pre !== fEstadoPre) return false;
+      // Filtro por código de carga (búsqueda parcial)
       if(fCodCarga && !String(x.codigo_carga).toUpperCase().includes(fCodCarga)) return false;
       return true;
     });
 
-    // modo doc / nombres
+    // ===== Filtro por documento o nombres =====
     const mode = document.querySelector('input[name="modo"]:checked')?.value || 'doc';
 
     if(mode === 'doc'){
       const tipo = ($('sel-tipodoc')?.value || '').trim();
       const num  = ($('inp-numdoc')?.value || '').trim();
-
       if(tipo || num){
         filtered = filtered.filter(x => {
           const okTipo = !tipo || x.tipodoc === tipo;
@@ -240,7 +292,6 @@ function onBuscar(){
       const a1 = norm($('inp-appat')?.value || '');
       const a2 = norm($('inp-apmat')?.value || '');
       const nm = norm($('inp-nombres')?.value || '');
-
       if(a1 || a2 || nm){
         filtered = filtered.filter(x => {
           let ok = true;
@@ -255,17 +306,24 @@ function onBuscar(){
     lastResults = filtered;
 
     if(filtered.length === 0){
-      setMsg('No se encontraron resultados en la búsqueda.');
+      setMsg('No se encontraron resultados con los filtros aplicados.');
       showOK('Búsqueda finalizada. 0 resultados.');
       return;
     }
 
+    // ===== Resumen de estados =====
+    const resumen = {};
+    filtered.forEach(x => {
+      resumen[x.estado_solicitud] = (resumen[x.estado_solicitud] || 0) + 1;
+    });
+    const resumenTxt = Object.entries(resumen).map(([k,v]) => `${k}: ${v}`).join(' | ');
+
     renderTable(filtered);
-    setMsg(`Se encontraron ${filtered.length} resultado${filtered.length>1?'s':''}.`);
-    showOK(`Búsqueda OK. Resultados: ${filtered.length}.`);
+    setMsg(`Se encontraron ${filtered.length} resultado(s). [ ${resumenTxt} ]`);
+    showOK(`Búsqueda OK — ${filtered.length} registro(s) encontrados.`);
   }catch(err){
     console.error(err);
-    setMsg('No se encontraron resultados en la búsqueda.');
+    setMsg('Error en la búsqueda.');
     showE(err?.message ? `Error: ${err.message}` : 'Error en búsqueda.');
   }finally{
     btn?.classList.remove('loading'); if(btn) btn.disabled = false;
@@ -273,7 +331,7 @@ function onBuscar(){
 }
 
 // =====================
-// Render
+// Render tabla con badges de estado por persona
 // =====================
 function setMsg(msg){
   $('res-msg') && ($('res-msg').textContent = msg);
@@ -294,20 +352,20 @@ function renderTable(arr){
   arr.forEach(x => {
     const tr = document.createElement('tr');
     tr.innerHTML = `
-      <td style="font-weight:800">${esc(x.codigo_carga)}</td>
-      <td><span class="pill p-${esc(x.estado_solicitud)}">${esc(x.estado_solicitud)}</span></td>
-      <td><span class="pill p-pre">${esc(x.estado_pre)}</span></td>
-      <td>${esc(x.tipodoc)}</td>
-      <td style="font-weight:800">${esc(x.nro_documento)}</td>
-      <td>${esc(x.apellido_paterno)}</td>
-      <td>${esc(x.apellido_materno)}</td>
-      <td>${esc(x.nombres)}</td>
-      <td>${esc(x.ruc)}</td>
-      <td>${esc(x.razon_social)}</td>
-      <td>${esc(x.usuario_agente)}</td>
-      <td>${esc(x.origen_onp)}</td>
-      <td>${esc(x.fecha_nacimiento)}</td>
-      <td>${esc(x.mail_principal)}</td>
+      <td style="font-weight:800;color:#1c3997">${esc(x.codigo_carga || '-')}</td>
+      <td>${badgeEstado(x.estado_solicitud)}</td>
+      <td>${badgeEstadoPre(x.estado_pre)}</td>
+      <td>${esc(x.tipodoc || '-')}</td>
+      <td style="font-weight:800">${esc(x.nro_documento || '-')}</td>
+      <td>${esc(x.apellido_paterno || '-')}</td>
+      <td>${esc(x.apellido_materno || '-')}</td>
+      <td>${esc(x.nombres || '-')}</td>
+      <td>${esc(x.ruc || '-')}</td>
+      <td>${esc(x.razon_social || '-')}</td>
+      <td>${esc(x.usuario_agente || '-')}</td>
+      <td>${esc(x.origen_onp || '-')}</td>
+      <td>${esc(x.fecha_nacimiento || '-')}</td>
+      <td>${esc(x.mail_principal || '-')}</td>
     `;
     tbody.appendChild(tr);
   });
@@ -318,13 +376,13 @@ function renderTable(arr){
 }
 
 // =====================
-// Download Excel
+// Descargar Excel
 // =====================
 function onDescargar(){
   hideE(); hideOK();
 
   if(!lastResults || lastResults.length === 0){
-    showE('No hay resultados para descargar. Primero realiza una búsqueda.');
+    showE('No hay resultados para descargar. Primero realice una búsqueda.');
     return;
   }
   if(typeof XLSX === 'undefined'){
@@ -334,7 +392,8 @@ function onDescargar(){
 
   const aoa = [];
   aoa.push([
-    'CodigoCarga','EstadoSolicitud','EstadoPre','TipoDoc','NroDoc','ApellidoPaterno','ApellidoMaterno','Nombres',
+    'CodigoCarga','EstadoSolicitud','EstadoPre','TipoDoc','NroDoc',
+    'ApellidoPaterno','ApellidoMaterno','Nombres',
     'RUC','RazonSocial','UsuarioAgente','OrigenONP','FechaNacimiento','Email'
   ]);
 
@@ -352,5 +411,5 @@ function onDescargar(){
   XLSX.utils.book_append_sheet(wb, ws, 'Solicitudes');
   XLSX.writeFile(wb, `solicitudes_afiliacion_${new Date().toISOString().slice(0,10)}.xlsx`);
 
-  showOK('Archivo descargado.');
+  showOK('Archivo Excel descargado.');
 }
