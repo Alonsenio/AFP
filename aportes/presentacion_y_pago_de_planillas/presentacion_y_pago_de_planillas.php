@@ -13,17 +13,9 @@
 <body>
 
 <!-- TOPBAR -->
-<header class="topbar">
-    <div class="topbar-left">
-        <div class="topbar-logo" onclick="location.href='../../inicio/inicio.php'">AFPnet<span>PAGO FÁCIL</span></div>
-        <button class="btn-menu" id="btn-tog"><i class="fas fa-bars"></i></button>
-        <div class="topbar-welcome">Bienvenido Sr(a). <strong id="w-name">Usuario</strong></div>
-    </div>
-    <div class="topbar-right">
-        <div class="topbar-time" id="tb-time"></div>
-        <div class="user-badge"><div class="user-avatar" id="u-init">U</div><span id="u-name">Usuario</span></div>
-    </div>
-</header>
+<?php
+    require "../../componentes/topbar.php"
+?>
 <div class="sov" id="sov"></div>
 <!-- SIDEBAR -->
 <?php
@@ -36,8 +28,8 @@
         <div class="imp-box">
             <h3>Importante:</h3>
             <ul>
-                <li>Descargue el modelo para la declaración de planilla <a href="#">aquí</a> y el modelo para la declaración de las semanas contributivas <a href="#">aquí</a>.</li>
-                <li>Tenga en cuenta que solo puede trabajar la información de esta bandeja de trabajo hasta el final del día. Luego la información será borrada.</li>
+                <li>Descargue el modelo para la declaración de planilla aquí y el modelo para la declaración de las semanas contributivas aquí. <a href="#">aquí</a> y el modelo para la declaración de las semanas contributivas <a href="#">aquí</a>.</li>
+                <li>Descargue el modelo para la declaración de planilla aquí y el modelo para la declaración de las semanas contributivas aquí.</li>
             </ul>
         </div>
 

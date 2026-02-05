@@ -8,27 +8,10 @@
     <link rel="stylesheet" href="./inicio.css">
 </head>
 <body>
-    <!-- ===== SECCION DE TOP BAR ===== -->
-    <header class="topbar">
-        <div class="topbar-left">
-            <div class="topbar-logo">
-                AFPnet
-                <span>PAGO FÁCIL</span>
-            </div>
-            <button class="btn-menu-toggle" id="btn-toggle-sidebar" title="Menú">
-                <i class="fas fa-bars"></i>
-            </button>
-            <div class="topbar-welcome">
-                Bienvenido Sr(a). <strong id="welcome-name">Usuario</strong>
-            </div>
-        </div>
-        <div class="topbar-right">
-            <div class="user-badge">
-                <div class="user-avatar" id="user-initials">U</div>
-                <span id="user-display-name">Usuario</span>
-            </div>
-        </div>
-    </header>
+    <!-- ===== TOP BAR ===== -->
+    <?php
+        require "../componentes/topbar.php"
+    ?>
     <!-- ===== SIDEBAR ===== -->
     <?php
         require "../componentes/sidebar.php"

@@ -50,6 +50,17 @@ a { text-decoration: none; color: inherit; }
     align-items: stretch;
 }
 
+/* -- logo -- */
+.logo-img {
+    max-width: 160px;
+    height: auto;
+    display: block;
+    margin: 0 auto;
+}
+.collapsed .logo-img {
+    max-width: 40px;
+}
+
 /* -- Sidebar Card -- */
 .sidebar-card {
     flex: 0 0 320px;

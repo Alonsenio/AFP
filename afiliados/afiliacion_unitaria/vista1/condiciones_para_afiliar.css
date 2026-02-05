@@ -18,7 +18,7 @@ a{text-decoration:none;color:inherit}
 .topbar-logo span{font-size:9px;color:#f0a030;display:block;letter-spacing:2px;margin-top:-3px}
 .btn-menu{background:none;border:none;color:var(--white);font-size:20px;cursor:pointer;padding:6px;border-radius:4px;transition:background .2s}
 .btn-menu:hover{background:rgba(255,255,255,.12)}
-.topbar-info{color:var(--white);font-size:12px;line-height:1.4}
+.topbar-info{color:var(--white);font-size:10px;line-height:1.4}
 .topbar-info .ruc{font-weight:600;color:#ffd54f}
 .topbar-right{display:flex;align-items:center;gap:14px}
 .topbar-time{color:rgba(255,255,255,.8);font-size:12px;text-align:right;line-height:1.3}

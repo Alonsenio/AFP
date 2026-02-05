@@ -10,25 +10,9 @@
 <body>
 
 <!-- TOPBAR -->
-<header class="topbar">
-  <div class="topbar-left">
-    <div class="topbar-logo" onclick="location.href='../../inicio/inicio.php'">AFPnet<span>PAGO FÁCIL</span></div>
-    <button class="btn-menu" id="btn-tog" type="button"><i class="fas fa-bars"></i></button>
-
-    <div class="topbar-info">
-      <span class="ruc" id="tb-ruc">20100000001</span> - <span id="tb-razon">EMPRESA</span><br>
-      Bienvenido Sr(a). <strong id="w-name">Usuario</strong> (<span id="w-perfil">Administrador</span>)
-    </div>
-  </div>
-
-  <div class="topbar-right">
-    <div class="topbar-time" id="tb-time"></div>
-    <div class="user-badge">
-      <div class="user-avatar" id="u-init">U</div>
-      <span id="u-name">Usuario</span>
-    </div>
-  </div>
-</header>
+<?php
+    require "../../componentes/topbar.php"
+?>
 
 <div class="sov" id="sov"></div>
 <!-- SIDEBAR -->
@@ -43,8 +27,9 @@
     <div class="info-card">
       <div class="info-title">Importante:</div>
       <ul class="info-list">
-        <li>Sube un archivo <strong>Excel (.xlsx / .xls)</strong> o <strong>CSV (.csv)</strong>.</li>
-        <li>Formato por fila: <strong>TipoDocCode</strong>, <strong>NroDoc</strong>, <strong>Apellido Paterno</strong>, <strong>Apellido Materno</strong>, <strong>Nombres</strong>.</li>
+        <li>Descargue el modelo para la Consulta de CUSPP <a href="#">aquí</a></li>
+        <li>Si solamente desea conocer el CUSPP de sus trabajadores no seleccione un devengue. Usted podrá consultar un máximo de 1000 registros en condiciones normales. Sin embargo, en momentos de máxima utilización del servicio este número puede ser temporalmente reducido a 100.</li>
+        <li>Si además desea conocer la AFP y el porcentaje de comisión sobre remuneración seleccione un devengue. Usted podrá consultar un máximo de 100 registros.</li>
         
       </ul>
     </div>

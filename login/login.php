@@ -13,12 +13,7 @@
         <div class="hero-container">
             <div class="sidebar-card">
                 <div class="logo-container">
-                    <svg class="logo-arc" viewBox="0 0 100 40" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <path d="M15 38 Q50 -5 85 38" stroke="white" stroke-width="5" fill="none" stroke-linecap="round"/>
-                        <path d="M25 38 Q50 5 75 38" stroke="white" stroke-width="4" fill="none" stroke-linecap="round"/>
-                    </svg>
-                    <div class="logo-text">AFPnet</div>
-                    <div class="logo-subtitle">PAGO FÁCIL</div>
+                    <img src="../img/logo_home.png" alt="AFPnet" class="logo-img">
                 </div>
                 <nav class="sidebar-links">
                     <a href="#">¿QUÉ ES AFPNET?</a>

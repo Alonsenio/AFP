@@ -1,386 +1,242 @@
-// afiliacion_masiva.js
+// ===== DATOS DE RESPALDO =====
+const DATA_BACKUP = [
+    { ruc: '20603401574', user: 'jcalderon', nombre: 'Jose Luis Calderon Ormeño', appat: 'Calderon', apmat: 'Ormeño', perfil: 'Administrador', estado: 'ACTIVO' },
+    { ruc: '20603401574', user: 'mgarcia',   nombre: 'Maria Garcia Lopez',       appat: 'Garcia',   apmat: 'Lopez',   perfil: 'Operador',       estado: 'ACTIVO' },
+    { ruc: '20603401574', user: 'jquispe',   nombre: 'Juan Quispe Rojas',        appat: 'Quispe',   apmat: 'Rojas',   perfil: 'Operador',       estado: 'ACTIVO' },
+    { ruc: '20603401574', user: 'cflores',   nombre: 'Carlos Flores Diaz',       appat: 'Flores',   apmat: 'Diaz',    perfil: 'Administrador',  estado: 'ACTIVO' },
+    { ruc: '20603401574', user: 'lrodriguez',nombre: 'Lucia Rodriguez Pena',     appat: 'Rodriguez', apmat: 'Pena',   perfil: 'Operador',       estado: 'INACTIVO' },
+];
 
-// =====================
-// Helpers
-// =====================
-function $(id){ return document.getElementById(id); }
-function on(id, evt, fn){
-  const el = $(id);
-  if(!el) return;
-  el.addEventListener(evt, fn);
-}
+// ===== HELPERS =====
+const $ = id => document.getElementById(id);
+let editingIndex = -1;
 
-// Stubs sidebar
-function setActive(){}
-function togSub(el){
-  const sub=el?.nextElementSibling; if(!sub) return;
-  const op=sub.classList.contains('open');
-  document.querySelectorAll('.submenu.open').forEach(s=>{
-    if(s!==sub){ s.classList.remove('open'); s.previousElementSibling?.classList.remove('open'); }
-  });
-  if(!op){ sub.classList.add('open'); el.classList.add('open'); }
-  else { sub.classList.remove('open'); el.classList.remove('open'); }
-}
-function cerrarSesion(){ sessionStorage.clear(); location.href='../../login/login.php'; }
-
-// ===== TOPBAR SESSION =====
-const userRUC = sessionStorage.getItem('afpnet_ruc') || '20603401574';
-const uName = sessionStorage.getItem('afpnet_nombre') || sessionStorage.getItem('afpnet_usuario') || 'Usuario';
-const uPerfil = 'Administrador';
-
-// ===== STORAGE =====
-const BATCHES_KEY = 'afpnet_afiliacion_masiva_batches';
-
-// ===== UI INIT =====
-window.addEventListener('DOMContentLoaded', () => {
-  const dn = String(uName).trim() || 'Usuario';
-  $('w-name') && ($('w-name').textContent = dn);
-  $('u-name') && ($('u-name').textContent = dn);
-  $('u-init') && ($('u-init').textContent = (dn.substring(0,2) || 'U').toUpperCase());
-  $('w-perfil') && ($('w-perfil').textContent = uPerfil);
-  $('tb-ruc') && ($('tb-ruc').textContent = userRUC);
-  $('tb-razon') && ($('tb-razon').textContent = 'EMPRESA S.A.C.');
-  updClk(); setInterval(updClk, 1000);
-  wireSidebar();
-
-  on('btn-cargar','click', onCargar);
-  on('btn-export','click', exportExcelUltimoLote);
-  on('btn-clear','click', clearSaved);
-  on('btn-guia','click', () => alert('Aquí abrirás tu guía de uso.'));
-  on('lnk-modelo','click', (e) => { e.preventDefault(); descargarModelo(); });
-
-  renderUltimoLote();
+// ===== INIT =====
+document.addEventListener('DOMContentLoaded', () => {
+    initData();
+    bindEvents();
+    // Mostrar todos al cargar
+    onBuscar();
 });
 
-function updClk(){
-  if(!$('tb-time')) return;
-  const n = new Date();
-  $('tb-time').innerHTML =
-    n.toLocaleTimeString('es-PE',{hour:'2-digit',minute:'2-digit',second:'2-digit',hour12:true}) +
-    '<br>' + n.toLocaleDateString('es-PE',{day:'2-digit',month:'2-digit',year:'numeric'});
-}
-function wireSidebar(){
-  const sb = $('sb');
-  const mc = $('mc');
-  const sov = $('sov');
-  const btn = $('btn-tog');
-  if(btn){
-    btn.onclick = () => {
-      if(!sb) return;
-      if(innerWidth<=768){ sb.classList.toggle('mob'); sov?.classList.toggle('vis'); }
-      else { sb.classList.toggle('collapsed'); mc?.classList.toggle('exp'); }
-    };
-  }
-  if(sov){
-    sov.onclick = () => { sb?.classList.remove('mob'); sov.classList.remove('vis'); };
-  }
+function initData() {
+    const currentRuc = sessionStorage.getItem('afpnet_ruc') || '20603401574';
+
+    let existentes = [];
+    try {
+        const raw = localStorage.getItem('afpnet_db_usuarios');
+        if (raw) existentes = JSON.parse(raw);
+    } catch(_) {}
+
+    const tieneDelRuc = Array.isArray(existentes) && existentes.some(u => String(u.ruc) === String(currentRuc));
+
+    if (!tieneDelRuc) {
+        const adaptados = DATA_BACKUP.map(u => ({ ...u, ruc: currentRuc }));
+        const merged = Array.isArray(existentes) ? [...existentes, ...adaptados] : adaptados;
+        localStorage.setItem('afpnet_db_usuarios', JSON.stringify(merged));
+    }
 }
 
-// ===== Messages =====
-function showE(m){ hideOK(); $('m-err-t') && ($('m-err-t').textContent=m); $('m-err')?.classList.add('vis'); }
-function hideE(){ $('m-err')?.classList.remove('vis'); }
-function showOK(m){ hideE(); $('m-ok-t') && ($('m-ok-t').textContent=m); $('m-ok')?.classList.add('vis'); }
-function hideOK(){ $('m-ok')?.classList.remove('vis'); }
-
-// ===== Utils =====
-function esc(s){
-  return String(s ?? '').replace(/[&<>"']/g, m => ({
-    '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'
-  }[m]));
-}
-function norm(s){ return String(s||'').trim(); }
-
-// ===================================================================
-// Genera CM-YYYY-0001 incremental por año (único y consistente)
-// ===================================================================
-function genCodigoCarga(){
-  const year = new Date().getFullYear();
-  const key = `afpnet_cm_counter_${year}`;
-  const last = parseInt(localStorage.getItem(key) || '0', 10);
-  const next = last + 1;
-  localStorage.setItem(key, String(next));
-  return `CM-${year}-${String(next).padStart(4,'0')}`;
+function bindEvents() {
+    $('btn-buscar')?.addEventListener('click', onBuscar);
+    $('btn-agregar')?.addEventListener('click', () => openAgregar());
+    $('btn-desactivar')?.addEventListener('click', onDesactivar);
+    $('btn-guia')?.addEventListener('click', () => alert('Aquí abrirás tu guía de uso.'));
+    $('btn-save-user')?.addEventListener('click', onGuardar);
+    $('chk-all')?.addEventListener('change', onCheckAll);
 }
 
-// ===================================================================
-// Asigna un estado simulado individual a cada registro
-// Esto permite que en Consulta se vean estados variados por persona
-// ===================================================================
-function asignarEstadoIndividual(){
-  const estados = ['REGISTRADA','REGISTRADA','REGISTRADA','OBSERVADA','APROBADA'];
-  return estados[Math.floor(Math.random() * estados.length)];
+// ===== CARGAR USUARIOS =====
+function getUsuarios() {
+    try {
+        const raw = localStorage.getItem('afpnet_db_usuarios');
+        return raw ? JSON.parse(raw) : [];
+    } catch (_) { return []; }
 }
-function asignarEstadoPre(){
-  const estados = ['SIN_PRE','SIN_PRE','PRE_REGISTRADA','PRE_OBSERVADA'];
-  return estados[Math.floor(Math.random() * estados.length)];
+function saveUsuarios(arr) {
+    localStorage.setItem('afpnet_db_usuarios', JSON.stringify(arr));
 }
 
-// ===== LocalStorage batches =====
-function loadBatches(){
-  try{
-    const raw = localStorage.getItem(BATCHES_KEY);
-    if(!raw) return [];
-    const parsed = JSON.parse(raw);
-    return Array.isArray(parsed) ? parsed : [];
-  }catch(_){ return []; }
-}
-function saveBatches(arr){
-  localStorage.setItem(BATCHES_KEY, JSON.stringify(arr));
-}
+// ===== BUSCAR =====
+function onBuscar() {
+    const fUser  = ($('inp-usuario')?.value || '').trim().toLowerCase();
+    const fAppat = ($('inp-appat')?.value || '').trim().toLowerCase();
+    const fApmat = ($('inp-apmat')?.value || '').trim().toLowerCase();
 
-// ===== Parse file (.xlsx/.xls/.csv/.txt) =====
-async function readFileToRows(file){
-  const ext = (file.name.split('.').pop() || '').toLowerCase();
+    const currentRuc = sessionStorage.getItem('afpnet_ruc') || '20603401574';
+    const todos = getUsuarios();
 
-  if(ext === 'txt'){
-    const text = await file.text();
-    const lines = text.split(/\r?\n/).filter(l => l.trim() !== '');
-    return lines.map(l => l.split('|').map(x => String(x ?? '').trim()));
-  }
+    const filtered = todos.filter(u => {
+        if (String(u.ruc) !== String(currentRuc)) return false;
 
-  if(ext === 'csv'){
-    const text = await file.text();
-    const lines = text.split(/\r?\n/).filter(l => l.trim() !== '');
-    return lines.map(l => {
-      const sep = l.includes('\t') ? '\t' : ',';
-      return l.split(sep).map(x => String(x ?? '').trim());
+        // Filtro por usuario
+        if (fUser && !(u.user || '').toLowerCase().includes(fUser)) return false;
+
+        // Filtro por apellido paterno (busca en appat y en nombre)
+        if (fAppat) {
+            const enAppat  = (u.appat || '').toLowerCase().includes(fAppat);
+            const enNombre = (u.nombre || '').toLowerCase().includes(fAppat);
+            if (!enAppat && !enNombre) return false;
+        }
+
+        // Filtro por apellido materno (busca en apmat y en nombre)
+        if (fApmat) {
+            const enApmat  = (u.apmat || '').toLowerCase().includes(fApmat);
+            const enNombre = (u.nombre || '').toLowerCase().includes(fApmat);
+            if (!enApmat && !enNombre) return false;
+        }
+
+        return true;
     });
-  }
 
-  return new Promise((resolve, reject)=>{
-    const reader = new FileReader();
-    reader.onload = (e)=>{
-      try{
-        if(typeof XLSX === 'undefined'){
-          reject(new Error('La librería XLSX no cargó (CDN).'));
-          return;
-        }
-        const buf = e.target.result;
-        if(!buf){ reject(new Error('No se pudo leer el archivo.')); return; }
-        const u8 = new Uint8Array(buf);
-        const wb = XLSX.read(u8, { type:'array', dense:true, cellDates:true });
-        if(!wb.SheetNames || wb.SheetNames.length === 0){
-          reject(new Error('El Excel no contiene hojas.'));
-          return;
-        }
-        for(const name of wb.SheetNames){
-          const ws = wb.Sheets[name];
-          if(!ws) continue;
-          const aoa = XLSX.utils.sheet_to_json(ws, { header:1, raw:false });
-          const cleaned = (aoa || [])
-            .filter(r => Array.isArray(r) && r.some(c => String(c ?? '').trim() !== ''))
-            .map(r => r.map(c => String(c ?? '').trim()));
-          if(cleaned.length > 0){ resolve(cleaned); return; }
-        }
-        reject(new Error('No se encontró data en ninguna hoja.'));
-      }catch(_){
-        reject(new Error('Excel inválido o no soportado. Guárdalo como .xlsx.'));
-      }
-    };
-    reader.onerror = () => reject(new Error('No se pudo leer el archivo.'));
-    reader.readAsArrayBuffer(file);
-  });
+    renderTable(filtered);
 }
 
-// ===== Normalización según formato =====
-function normalizeRows(rows){
-  const first = (rows?.[0] || []).join(' ').toLowerCase();
-  const start = (first.includes('document') || first.includes('nro') || first.includes('apellido') || first.includes('nombres')) ? 1 : 0;
+// ===== RENDER TABLA =====
+function renderTable(arr) {
+    const tbody = $('user-table-body');
+    if (!tbody) return;
+    tbody.innerHTML = '';
 
-  const out = [];
-  for(let i=start;i<rows.length;i++){
-    const r = rows[i] || [];
-    const nro_documento = norm(r[0]);
-    const nombres = norm(r[1]);
-    const apellido_paterno = norm(r[2]);
-    const apellido_materno = norm(r[3]);
-
-    if(!nro_documento && !nombres && !apellido_paterno && !apellido_materno) continue;
-
-    out.push({
-      tipodoc: 'DNI',
-      nro_documento,
-      nombres,
-      apellido_paterno,
-      apellido_materno,
-      fecha_nacimiento: norm(r[4]),
-      mail_principal: norm(r[5]),
-      tel_fijo: norm(r[6]),
-      tel_movil: norm(r[7]),
-      ubigeo: norm(r[8]),
-      tipo_via: norm(r[9]),
-      nombre_via: norm(r[10]),
-      ruc: norm(r[11]) || userRUC,
-      razon_social: norm(r[12]) || 'EMPRESA S.A.C.',
-      usuario_agente: norm(r[13]) || (String(uName).trim() || 'Usuario'),
-      origen_onp: norm(r[14]) || '0',
-    });
-  }
-  return out;
-}
-
-// ===== Cargar y guardar lote =====
-let lastBatch = null;
-
-async function onCargar(){
-  hideE(); hideOK();
-  $('results')?.classList.remove('vis');
-  if($('results')) $('results').style.display = 'none';
-
-  const file = $('file')?.files?.[0];
-  if(!file){ showE('Debe seleccionar un archivo (.txt, .xls, .xlsx, .csv)'); return; }
-
-  const btn = $('btn-cargar');
-  btn?.classList.add('loading'); if(btn) btn.disabled = true;
-
-  try{
-    const rows = await readFileToRows(file);
-    const registros = normalizeRows(rows);
-
-    if(registros.length === 0){
-      showE('El archivo no contiene filas válidas.');
-      return;
+    if (arr.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="7" style="text-align:center;padding:30px;color:#999;">No se encontraron usuarios.</td></tr>`;
+        return;
     }
 
-    // ✅ Generar código único para este lote
-    const codigo = genCodigoCarga();
-
-    // ✅ Cada registro recibe su propio estado individual
-    const batch = {
-      codigo_carga: codigo,
-      created_at: new Date().toISOString(),
-      file_name: file.name,
-      ruc: userRUC,
-      razon_social: 'EMPRESA S.A.C.',
-      usuario_agente: (String(uName).trim() || 'Usuario'),
-      registros: registros.map(x => ({
-        ...x,
-        codigo_carga: codigo,
-        estado_solicitud: asignarEstadoIndividual(),
-        estado_pre: asignarEstadoPre()
-      }))
-    };
-
-    const batches = loadBatches();
-    batches.push(batch);
-    saveBatches(batches);
-
-    lastBatch = batch;
-    renderBatch(batch);
-
-    showOK(`✅ Carga exitosa — Código: ${codigo} — ${batch.registros.length} registro(s). Use este código en "Consulta de Solicitudes" para ver el estado de cada persona.`);
-  }catch(err){
-    console.error(err);
-    showE(err?.message ? `Error: ${err.message}` : 'Error al cargar archivo.');
-  }finally{
-    btn?.classList.remove('loading'); if(btn) btn.disabled = false;
-  }
+    arr.forEach((u) => {
+        const esActivo = (u.estado || 'ACTIVO') === 'ACTIVO';
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+            <td style="text-align:center;"><input type="checkbox" class="chk-row" data-user="${esc(u.user)}"></td>
+            <td><strong>${esc(u.user)}</strong></td>
+            <td>${esc(u.nombre)}</td>
+            <td>${esc(u.ruc)}</td>
+            <td><span class="badge ${u.perfil === 'Administrador' ? 'badge-admin' : 'badge-user'}">${esc(u.perfil)}</span></td>
+            <td><span class="badge ${esActivo ? 'badge-pres' : 'badge-pend'}">${esActivo ? 'ACTIVO' : 'INACTIVO'}</span></td>
+            <td>
+                <button class="btn btn-blue btn-mini" onclick="openEditar('${esc(u.user)}')" title="Editar"><i class="fas fa-edit"></i></button>
+                <button class="btn btn-pink btn-mini" onclick="eliminarUser('${esc(u.user)}')" title="Eliminar"><i class="fas fa-trash"></i></button>
+            </td>
+        `;
+        tbody.appendChild(tr);
+    });
 }
 
-function renderUltimoLote(){
-  const batches = loadBatches();
-  if(!batches.length) return;
-  lastBatch = batches[batches.length - 1];
-  renderBatch(lastBatch);
+function esc(s) {
+    return String(s ?? '').replace(/[&<>"']/g, m => ({
+        '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;'
+    }[m]));
 }
 
-function renderBatch(batch){
-  const section = $('results');
-  const tbody = $('res-body');
-  const countEl = $('res-count');
-  const codeView = $('cod-carga-view');
-  if(!section || !tbody || !countEl) return;
-
-  // ✅ Mostrar código prominente
-  if(codeView) codeView.textContent = batch.codigo_carga || '-';
-
-  tbody.innerHTML = '';
-
-  countEl.innerHTML =
-    `Se cargó <strong>${batch.registros.length}</strong> registro(s) con código ` +
-    `<strong>${esc(batch.codigo_carga)}</strong>`;
-
-  batch.registros.forEach(r => {
-    const tr = document.createElement('tr');
-    tr.innerHTML = `
-      <td style="font-weight:900;color:#1c3997">${esc(batch.codigo_carga)}</td>
-      <td style="font-weight:800">${esc(r.nro_documento)}</td>
-      <td>${esc(r.nombres)}</td>
-      <td>${esc(r.apellido_paterno)}</td>
-      <td>${esc(r.apellido_materno)}</td>
-      <td>${esc(r.fecha_nacimiento)}</td>
-      <td>${esc(r.mail_principal)}</td>
-      <td>${esc(r.tel_fijo)}</td>
-      <td>${esc(r.tel_movil)}</td>
-      <td>${esc(r.ubigeo)}</td>
-      <td>${esc(r.tipo_via)}</td>
-      <td>${esc(r.nombre_via)}</td>
-      <td>${esc(r.ruc)}</td>
-      <td>${esc(r.razon_social)}</td>
-      <td>${esc(r.usuario_agente)}</td>
-      <td>${esc(r.origen_onp)}</td>
-    `;
-    tbody.appendChild(tr);
-  });
-
-  section.classList.add('vis');
-  section.style.display = 'block';
-  section.scrollIntoView({behavior:'smooth', block:'start'});
+// ===== CHECKBOX ALL =====
+function onCheckAll() {
+    const checked = $('chk-all')?.checked || false;
+    document.querySelectorAll('.chk-row').forEach(c => c.checked = checked);
 }
 
-// ===== Export / Clear =====
-function exportExcelUltimoLote(){
-  hideE(); hideOK();
-  const batch = lastBatch;
-  if(!batch || !batch.registros || batch.registros.length === 0){
-    showE('No hay un lote cargado para exportar.');
-    return;
-  }
-  if(typeof XLSX === 'undefined'){
-    showE('XLSX no está disponible (CDN).');
-    return;
-  }
-  const aoa = [];
-  aoa.push([
-    'CodigoCarga','NroDocumento','Nombres','ApellidoPaterno','ApellidoMaterno','FechaNac','Email','TelFijo','TelMovil',
-    'Ubigeo','TipoVia','NombreVia','RUC','RazonSocial','UsuarioAgente','OrigenONP','EstadoSolicitud','EstadoPre'
-  ]);
-  batch.registros.forEach(r => {
-    aoa.push([
-      batch.codigo_carga,
-      r.nro_documento, r.nombres, r.apellido_paterno, r.apellido_materno, r.fecha_nacimiento, r.mail_principal,
-      r.tel_fijo, r.tel_movil, r.ubigeo, r.tipo_via, r.nombre_via,
-      r.ruc, r.razon_social, r.usuario_agente, r.origen_onp,
-      r.estado_solicitud || 'REGISTRADA', r.estado_pre || 'SIN_PRE'
-    ]);
-  });
-  const ws = XLSX.utils.aoa_to_sheet(aoa);
-  const wb = XLSX.utils.book_new();
-  XLSX.utils.book_append_sheet(wb, ws, 'CargaMasiva');
-  XLSX.writeFile(wb, `afiliacion_masiva_${batch.codigo_carga}.xlsx`);
-  showOK('Excel descargado.');
+// ===== AGREGAR =====
+function openAgregar() {
+    editingIndex = -1;
+    const title = $('mo-user-title');
+    if (title) title.textContent = 'REGISTRAR NUEVO USUARIO';
+    if ($('in-user')) { $('in-user').value = ''; $('in-user').disabled = false; }
+    if ($('in-name')) $('in-name').value = '';
+    if ($('in-per')) $('in-per').value = 'Operador';
+    openM('mo-user');
 }
 
-function clearSaved(){
-  if(!confirm('¿Seguro que desea borrar todo lo guardado?')) return;
-  localStorage.removeItem(BATCHES_KEY);
-  lastBatch = null;
-  $('results') && ($('results').style.display = 'none');
-  $('cod-carga-view') && ($('cod-carga-view').textContent = '-');
-  showOK('Guardado eliminado.');
+// ===== EDITAR =====
+function openEditar(userId) {
+    const todos = getUsuarios();
+    const idx = todos.findIndex(u => u.user === userId);
+    if (idx < 0) return;
+
+    editingIndex = idx;
+    const u = todos[idx];
+    const title = $('mo-user-title');
+    if (title) title.textContent = 'EDITAR USUARIO';
+    if ($('in-user')) { $('in-user').value = u.user; $('in-user').disabled = true; }
+    if ($('in-name')) $('in-name').value = u.nombre;
+    if ($('in-per')) $('in-per').value = u.perfil;
+    openM('mo-user');
 }
 
-// ===== Modelo =====
-function descargarModelo(){
-  if(typeof XLSX === 'undefined'){
-    showE('XLSX no está disponible (CDN).');
-    return;
-  }
-  const aoa = [];
-  aoa.push(['NroDoc','Nombres','ApellidoPaterno','ApellidoMaterno','FechaNac','Email','TelFijo','TelMovil','Ubigeo','TipoVia','NombreVia','RUC','RazonSocial','UsuarioAgente','OrigenONP']);
-  aoa.push(['10379368','NEVARDO ALCIDES','ALZAMORA','LARA','04/09/1974','neal_tato@hotmail.com','5436505','954778576','15316','Jr','San Antonio 452','','','','0']);
-  const ws = XLSX.utils.aoa_to_sheet(aoa);
-  const wb = XLSX.utils.book_new();
-  XLSX.utils.book_append_sheet(wb, ws, 'Modelo');
-  XLSX.writeFile(wb, 'modelo_afiliacion_masiva.xlsx');
+// ===== GUARDAR (AGREGAR / EDITAR) =====
+function onGuardar() {
+    const user = ($('in-user')?.value || '').trim();
+    const name = ($('in-name')?.value || '').trim();
+    const perf = $('in-per')?.value || 'Operador';
+
+    if (!user) { alert('Ingrese el Usuario (ID).'); return; }
+    if (!name) { alert('Ingrese el Nombre Completo.'); return; }
+
+    const currentRuc = sessionStorage.getItem('afpnet_ruc') || '20603401574';
+    const todos = getUsuarios();
+
+    if (editingIndex >= 0) {
+        todos[editingIndex].nombre = name;
+        todos[editingIndex].perfil = perf;
+        saveUsuarios(todos);
+        closeM('mo-user');
+        alert(`Usuario "${user}" actualizado.`);
+    } else {
+        if (todos.some(u => u.user === user && String(u.ruc) === String(currentRuc))) {
+            alert('Ya existe un usuario con ese ID.');
+            return;
+        }
+        const partes = name.split(' ');
+        todos.push({
+            ruc: currentRuc,
+            user: user,
+            nombre: name,
+            appat: partes[0] || '',
+            apmat: partes[1] || '',
+            perfil: perf,
+            estado: 'ACTIVO'
+        });
+        saveUsuarios(todos);
+        closeM('mo-user');
+        alert(`Usuario "${user}" registrado.`);
+    }
+
+    onBuscar();
 }
+
+// ===== ELIMINAR =====
+function eliminarUser(userId) {
+    if (!confirm(`¿Eliminar al usuario "${userId}"?`)) return;
+
+    const todos = getUsuarios();
+    const idx = todos.findIndex(u => u.user === userId);
+    if (idx < 0) return;
+
+    todos.splice(idx, 1);
+    saveUsuarios(todos);
+    alert(`Usuario "${userId}" eliminado.`);
+    onBuscar();
+}
+
+// ===== DESACTIVAR SELECCIONADOS =====
+function onDesactivar() {
+    const checks = document.querySelectorAll('.chk-row:checked');
+    if (checks.length === 0) {
+        alert('Seleccione al menos un usuario para desactivar.');
+        return;
+    }
+
+    const users = Array.from(checks).map(c => c.dataset.user);
+    if (!confirm(`¿Desactivar ${users.length} usuario(s)?`)) return;
+
+    const todos = getUsuarios();
+    users.forEach(uid => {
+        const u = todos.find(x => x.user === uid);
+        if (u) u.estado = 'INACTIVO';
+    });
+    saveUsuarios(todos);
+    alert(`${users.length} usuario(s) desactivado(s).`);
+    onBuscar();
+}
+
+// ===== MODALES =====
+function openM(id) { $(id)?.classList.add('vis'); }
+function closeM(id) { $(id)?.classList.remove('vis'); }
