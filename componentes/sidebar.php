@@ -40,8 +40,8 @@
                 <div class="submenu">
                     <a href="/AFP/afiliados/consulta_afiliados_unitaria/consulta_afiliados_unitaria.php" class="act">Consulta de Afiliados Unitaria</a>
                     <a href="/AFP/afiliados/consulta_afiliados_masiva/consulta_afiliados_masiva.php">Consulta de Afiliados Masiva</a>
-                    <a href="/AFP/afiliados/afiliacion_unitaria/afiliacion_unitaria.php">Afiliación Unitaria</a>
-                    <a href="/AFP/afiliados/afiliacion_unitaria/afiliacion_unitaria.php">Afiliación Masiva</a>
+                    <a href="/AFP/afiliados/afiliacion_unitaria/vista1/condiciones_para_afiliar.php">Afiliación Unitaria</a>
+                    <a href="/AFP/afiliados/afiliacion_masiva/afiliacion_masiva.php">Afiliación Masiva</a>
                     <a href="/AFP/afiliados/consulta_de_solicitudes_de_afiliados/consulta_de_solicitudes_de_afiliados.php">Consulta de Solicitudes de Afiliación</a>
                 </div>
             </div>

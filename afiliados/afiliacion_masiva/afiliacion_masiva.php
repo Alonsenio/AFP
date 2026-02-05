@@ -29,12 +29,9 @@
     </div>
   </div>
 </header>
-
 <div class="sov" id="sov"></div>
-
 <!-- SIDEBAR -->
 <?php require "../../componentes/sidebar.php"; ?>
-
 <!-- CONTENIDO -->
 <main class="main" id="mc">
   <div class="page-banner"><span>AFILIADOS &gt;</span> AFILIACIÓN MASIVA</div>
