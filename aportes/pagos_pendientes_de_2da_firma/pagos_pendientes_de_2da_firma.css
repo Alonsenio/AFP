@@ -1,0 +1,330 @@
+:root {
+    --color-primario: #003973;
+    --color-primario-claro: #0056b3;
+    --color-secundario: #4dd4e8;
+    --color-exito: #4CAF50;
+    --color-advertencia: #FF9800;
+    --color-peligro: #F44336;
+    --color-gris-claro: #f9fafb;
+    --color-gris: #e5e7eb;
+    --color-gris-oscuro: #6b7280;
+    --color-texto: #1f2937;
+    --sombra: 0 4px 12px rgba(0, 0, 0, 0.1);
+    --sombra-hover: 0 8px 20px rgba(0, 0, 0, 0.15);
+    --radio-borde: 8px;
+    --transicion: all 0.3s ease;
+}
+
+/* Contenido Principal */
+.main-content {
+    margin-left: 260px;
+    margin-top: 70px;
+    padding: 30px;
+    min-height: calc(100vh - 70px);
+    background-color: var(--color-gris-claro);
+}
+
+/* Header de Página */
+.page-header {
+    background: linear-gradient(135deg, var(--color-secundario) 0%, #7de5f5 100%);
+    padding: 20px 30px;
+    margin: -30px -30px 30px;
+    box-shadow: var(--sombra);
+}
+
+.page-header h1 {
+    font-size: 1.3rem;
+    font-weight: 600;
+    color: var(--color-primario);
+    letter-spacing: 0.5px;
+    margin: 0;
+}
+
+/* Sección de Contenido */
+.content-section {
+    background: white;
+    border-radius: var(--radio-borde);
+    padding: 30px;
+    margin-bottom: 30px;
+    box-shadow: var(--sombra);
+}
+
+/* Título de Sección */
+.section-title {
+    font-size: 1.15rem;
+    font-weight: 700;
+    color: var(--color-primario);
+    margin: 0 0 25px 0;
+    padding-bottom: 12px;
+    border-bottom: 2px solid var(--color-gris);
+}
+
+/* Formulario de Filtros */
+.filtros-form {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-end;
+    gap: 25px;
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.form-group label {
+    font-weight: 600;
+    color: var(--color-texto);
+    font-size: 0.92rem;
+    line-height: 1.4;
+}
+
+.form-input,
+.form-select {
+    width: 260px;
+    padding: 11px 14px;
+    border: 2px solid var(--color-gris);
+    border-radius: var(--radio-borde);
+    font-size: 0.95rem;
+    transition: var(--transicion);
+    background: white;
+    color: var(--color-texto);
+}
+
+.form-input:focus,
+.form-select:focus {
+    outline: none;
+    border-color: var(--color-primario);
+    box-shadow: 0 0 0 3px rgba(0, 57, 115, 0.1);
+}
+
+/* Acciones del Formulario */
+.form-actions {
+    display: flex;
+    gap: 15px;
+    margin-left: auto;
+    align-items: flex-end;
+}
+
+/* Botones */
+.btn {
+    padding: 12px 30px;
+    border: none;
+    border-radius: var(--radio-borde);
+    font-weight: 600;
+    font-size: 0.95rem;
+    cursor: pointer;
+    transition: var(--transicion);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    box-shadow: var(--sombra);
+    white-space: nowrap;
+}
+
+.btn:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--sombra-hover);
+}
+
+.btn:active {
+    transform: translateY(0);
+}
+
+.btn-guia {
+    background: linear-gradient(135deg, var(--color-exito) 0%, #66BB6A 100%);
+    color: white;
+}
+
+.btn-buscar {
+    background: linear-gradient(135deg, var(--color-advertencia) 0%, #FFB74D 100%);
+    color: white;
+}
+
+/* Sin Resultados */
+.sin-resultados {
+    padding: 15px 0;
+}
+
+.sin-resultados p {
+    color: var(--color-gris-oscuro);
+    font-size: 0.95rem;
+    margin: 0;
+}
+
+/* Tabla */
+.tabla-wrapper {
+    overflow-x: auto;
+    border-radius: var(--radio-borde);
+    box-shadow: var(--sombra);
+}
+
+.tabla-datos {
+    width: 100%;
+    border-collapse: collapse;
+    background: white;
+}
+
+.tabla-datos thead {
+    background: linear-gradient(135deg, var(--color-primario) 0%, #004a99 100%);
+    color: white;
+}
+
+.tabla-datos th {
+    padding: 15px 12px;
+    text-align: left;
+    font-weight: 600;
+    font-size: 0.85rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    white-space: nowrap;
+}
+
+.tabla-datos td {
+    padding: 15px 12px;
+    border-bottom: 1px solid var(--color-gris);
+    font-size: 0.9rem;
+}
+
+.tabla-datos tbody tr {
+    transition: var(--transicion);
+}
+
+.tabla-datos tbody tr:hover {
+    background-color: var(--color-gris-claro);
+}
+
+/* Estado Badge */
+.estado-badge {
+    display: inline-block;
+    padding: 6px 12px;
+    border-radius: 20px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.estado-pendiente {
+    background: #FFF3CD;
+    color: #856404;
+}
+
+.estado-firmado {
+    background: #D4EDDA;
+    color: #155724;
+}
+
+/* Botones de Tabla */
+.btn-tabla {
+    padding: 8px 16px;
+    font-size: 0.85rem;
+    border-radius: 6px;
+    border: none;
+    font-weight: 600;
+    cursor: pointer;
+    transition: var(--transicion);
+    text-transform: uppercase;
+    white-space: nowrap;
+}
+
+.btn-firmar {
+    background: linear-gradient(135deg, var(--color-primario) 0%, var(--color-primario-claro) 100%);
+    color: white;
+}
+
+.btn-ver {
+    background: linear-gradient(135deg, var(--color-exito) 0%, #66BB6A 100%);
+    color: white;
+}
+
+.btn-tabla:hover {
+    transform: scale(1.05);
+    box-shadow: var(--sombra);
+}
+
+/* Loading Overlay */
+.loading-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 10000;
+}
+
+.spinner {
+    width: 60px;
+    height: 60px;
+    border: 5px solid rgba(255, 255, 255, 0.3);
+    border-top-color: white;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+/* Mensaje de Éxito */
+.mensaje-exito {
+    position: fixed;
+    top: 100px;
+    right: 30px;
+    background: linear-gradient(135deg, var(--color-exito) 0%, #66BB6A 100%);
+    color: white;
+    padding: 15px 25px;
+    border-radius: var(--radio-borde);
+    box-shadow: var(--sombra-hover);
+    z-index: 9999;
+    font-weight: 600;
+    animation: slideInRight 0.3s ease-out;
+}
+
+@keyframes slideInRight {
+    from {
+        transform: translateX(400px);
+        opacity: 0;
+    }
+    to {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .main-content {
+        margin-left: 0;
+        padding: 20px;
+    }
+
+    .filtros-form {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .form-input,
+    .form-select {
+        width: 100%;
+    }
+
+    .form-actions {
+        margin-left: 0;
+        justify-content: flex-end;
+    }
+
+    .btn {
+        width: 100%;
+    }
+
+    .tabla-wrapper {
+        overflow-x: scroll;
+    }
+}

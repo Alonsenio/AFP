@@ -1,459 +1,693 @@
-// ===== GLOBALS =====
-let parsedRows=[], planillaData=[], selectedPeriodo='';
-const afpNames=['HABITAT','INTEGRA','PRIMA','PROFUTURO'];
-const userRUC=sessionStorage.getItem('afpnet_ruc')||'20100000001';
-const uName=sessionStorage.getItem('afpnet_usuario')||'Usuario';
+// Variables globales
+let datosActuales = null;
+let estadoActual = 'PENDIENTE';
 
-// ===== INIT =====
-window.addEventListener('DOMContentLoaded',()=>{
-const dn=uName.charAt(0).toUpperCase()+uName.slice(1);
-document.getElementById('w-name').textContent=dn;
-document.getElementById('u-name').textContent=dn;
-document.getElementById('u-init').textContent=dn.substring(0,2).toUpperCase();
-genPer();updClk();setInterval(updClk,1000);
+// ================================================
+// INICIALIZACIÓN
+// ================================================
+document.addEventListener('DOMContentLoaded', function() {
+    inicializarEventos();
 });
 
-function updClk(){const n=new Date();document.getElementById('tb-time').innerHTML=n.toLocaleTimeString('es-PE',{hour:'2-digit',minute:'2-digit',second:'2-digit',hour12:true})+'<br>'+n.toLocaleDateString('es-PE',{day:'2-digit',month:'2-digit',year:'numeric'})}
+function inicializarEventos() {
+    const formCarga = document.getElementById('form-carga');
+    if (formCarga) {
+        formCarga.addEventListener('submit', manejarCargaArchivo);
+    }
 
-function genPer(){const s=document.getElementById('sel-per');const n=new Date();let y=n.getFullYear(),m=n.getMonth()+1;for(let i=0;i<36;i++){const mo=String(m).padStart(2,'0');const o=document.createElement('option');o.value=y+'-'+mo;o.textContent=y+'-'+mo;s.appendChild(o);m--;if(m===0){m=12;y--}}}
-
-// ===== SIDEBAR =====
-const sb=document.getElementById('sb'),mc=document.getElementById('mc'),sov=document.getElementById('sov');
-document.getElementById('btn-tog').onclick=()=>{if(innerWidth<=768){sb.classList.toggle('mob');sov.classList.toggle('vis')}else{sb.classList.toggle('collapsed');mc.classList.toggle('exp')}};
-sov.onclick=()=>{sb.classList.remove('mob');sov.classList.remove('vis')};
-function togSub(el){const sub=el.nextElementSibling;if(!sub)return;const op=sub.classList.contains('open');document.querySelectorAll('.submenu.open').forEach(s=>{if(s!==sub){s.classList.remove('open');s.previousElementSibling.classList.remove('open')}});if(!op){sub.classList.add('open');el.classList.add('open')}else{sub.classList.remove('open');el.classList.remove('open')}}
-function cerrarSesion(){sessionStorage.clear();location.href='../../login/login.php'}
-
-// ===== FILE =====
-const fi=document.getElementById('file-input'),fn=document.getElementById('fu-n'),fw=document.getElementById('fu-w');
-fi.onchange=function(){if(this.files.length){fn.textContent=this.files[0].name;fn.style.color='var(--green)';fw.classList.add('has')}else resetF()};
-function resetF(){fi.value='';fn.textContent='Ningún archivo seleccionado';fn.style.color='#aab';fw.classList.remove('has')}
-
-// ===== MESSAGES =====
-function showE(m){hideO();document.getElementById('m-err-t').textContent=m;document.getElementById('m-err').classList.add('vis')}
-function hideE(){document.getElementById('m-err').classList.remove('vis')}
-function showO(m){hideE();document.getElementById('m-ok-t').textContent=m;document.getElementById('m-ok').classList.add('vis')}
-function hideO(){document.getElementById('m-ok').classList.remove('vis')}
-
-// ===== CARGAR =====
-document.getElementById('btn-cargar').onclick=function(){
-hideE();hideO();
-selectedPeriodo=document.getElementById('sel-per').value;
-if(!selectedPeriodo){showE('Debe seleccionar un Periodo de Devengue.');return}
-if(!fi.files||!fi.files.length){showE('Debe seleccionar un archivo de Planilla única.');return}
-const file=fi.files[0];
-const ext=file.name.substring(file.name.lastIndexOf('.')).toLowerCase();
-if(!['.xlsx','.xls','.csv'].includes(ext)){showE('El archivo debe ser formato Excel (.xlsx, .xls) o CSV.');return}
-const btn=this;btn.classList.add('loading');btn.disabled=true;
-const reader=new FileReader();
-reader.onload=function(e){
-    try{
-        const data=new Uint8Array(e.target.result);
-        const wb=XLSX.read(data,{type:'array'});
-        const ws=wb.Sheets[wb.SheetNames[0]];
-        parsedRows=XLSX.utils.sheet_to_json(ws,{header:1,defval:''});
-        if(!parsedRows.length){showE('El archivo está vacío.');btn.classList.remove('loading');btn.disabled=false;return}
-        setTimeout(()=>{procesar();showO('Archivo cargado correctamente. '+parsedRows.length+' registros procesados.');btn.classList.remove('loading');btn.disabled=false},1500);
-    }catch(err){showE('Error: '+err.message);btn.classList.remove('loading');btn.disabled=false}
-};
-reader.onerror=()=>{showE('Error al leer el archivo.');btn.classList.remove('loading');btn.disabled=false};
-reader.readAsArrayBuffer(file);
-};
-
-// ===== PROCESS =====
-function procesar(){
-const map={};
-parsedRows.forEach((row,i)=>{
-    const afp=afpNames[i%afpNames.length];
-    if(!map[afp])map[afp]={c:0,f:0,r:0};
-    map[afp].c++;
-    const rem=parseFloat(row[11])||1000;
-    map[afp].f+=rem*0.1;
-    map[afp].r+=rem*0.0154;
-});
-planillaData=[];
-Object.keys(map).forEach(afp=>{
-    const d=map[afp];
-    planillaData.push({afp,tipo:'D',rubro:'N',afil:d.c,fondo:d.f.toFixed(2),ret:d.r.toFixed(2),estado:'PENDIENTE',nPlan:Math.floor(2200000000+Math.random()*99999999),ticket:null});
-});
-renderTbl();
-document.getElementById('results').classList.add('vis');
-document.getElementById('results').scrollIntoView({behavior:'smooth'});
+    const inputArchivo = document.getElementById('planilla');
+    if (inputArchivo) {
+        inputArchivo.addEventListener('change', actualizarNombreArchivo);
+    }
 }
 
-// ===== RENDER TABLE =====
-function renderTbl(){
-const tb=document.getElementById('res-body');tb.innerHTML='';
-planillaData.forEach((r,i)=>{
-    const pr=r.estado==='PRESENTADA';
-    const tr=document.createElement('tr');
-    tr.innerHTML=`
-        <td style="font-weight:700">${r.afp}</td>
-        <td>${r.tipo}</td><td>${r.rubro}</td>
-        <td style="font-weight:600">${r.afil}</td>
-        <td style="text-align:right;font-weight:600">${r.fondo}</td>
-        <td style="text-align:right;font-weight:600">${r.ret}</td>
-        <td><span class="badge ${pr?'badge-pres':'badge-pend'}">${r.estado}</span></td>
-        <td style="font-size:11px;color:#666">${r.nPlan}</td>
-        <td><button class="btn btn-blue" style="padding:6px 12px;font-size:11px" onclick="dlPDF(${i})"><i class="fas fa-download"></i> DESCARGAR</button></td>
-        <td><button class="btn ${pr?'btn-gray':'btn-green'}" style="padding:6px 12px;font-size:11px" onclick="presentar(${i})" ${pr?'disabled':''}><i class="fas fa-paper-plane"></i> PRESENTAR</button></td>
-        <td><button class="btn btn-pink" style="padding:6px 12px;font-size:11px" onclick="descartar(${i})" ${pr?'disabled':''}><i class="fas fa-times-circle"></i> DESCARTAR</button></td>
-        <td><button class="btn btn-purple" style="padding:6px 12px;font-size:11px" onclick="emitir(${i})" ${!pr?'disabled':''}><i class="fas fa-ticket-alt"></i> EMITIR</button></td>`;
-    tb.appendChild(tr);
-});
+// ================================================
+// MANEJO DE ARCHIVO
+// ================================================
+function actualizarNombreArchivo(e) {
+    const archivo = e.target.files[0];
+    const nombreArchivo = document.getElementById('nombre-archivo');
+    
+    if (archivo) {
+        nombreArchivo.textContent = archivo.name;
+        nombreArchivo.style.background = 'linear-gradient(135deg, #4CAF50 0%, #66BB6A 100%)';
+    } else {
+        nombreArchivo.textContent = 'Planilla_Nuevo_Formato_Ejemplo.xlsx';
+        nombreArchivo.style.background = '#003973';
+    }
 }
 
-// ===== DESCARGAR PDF (Professional Planilla) =====
-function dlPDF(i){
-const r=planillaData[i];
-const{jsPDF}=window.jspdf;
-const doc=new jsPDF({orientation:'landscape',unit:'mm',format:'a4'});
-const W=297,H=210;
-const blue=[28,57,151],dk=[20,40,100],wh=[255,255,255];
+function manejarCargaArchivo(e) {
+    e.preventDefault();
+    
+    const periodo = document.getElementById('periodo').value;
+    const inputArchivo = document.getElementById('planilla');
+    const archivo = inputArchivo.files[0];
+    
+    if (!archivo) {
+        mostrarAlerta('Por favor seleccione un archivo', 'error');
+        return;
+    }
+    
+    const extension = archivo.name.split('.').pop().toLowerCase();
+    if (!['xlsx', 'xls'].includes(extension)) {
+        mostrarAlerta('Solo se permiten archivos Excel (.xlsx, .xls)', 'error');
+        return;
+    }
+    
+    mostrarLoading(true);
+    
+    const formData = new FormData();
+    formData.append('periodo', periodo);
+    formData.append('planilla', archivo);
+    formData.append('semana_contributiva', document.getElementById('semana_contributiva').checked);
+    
+    setTimeout(() => {
+        datosActuales = {
+            afp: 'INTEGRA',
+            tipo_trabajador: 'D',
+            tipo_trabajador_texto: 'DEPENDIENTE',
+            rubro: 'N',
+            tipo_riesgo: 'NORMAL',
+            num_afiliados: 5,
+            fondo_pensiones: '565.00',
+            retenciones: '77.40',
+            comision_afp: '0.00',
+            prima_seguro: '77.40',
+            intereses_moratorios_fondo: '0.00',
+            intereses_moratorios_ret: '0.00',
+            periodo: periodo,
+            ruc: '20123456789',
+            razon_social: 'EMPRESA EJEMPLO S.A.C.',
+            direccion: 'Calle Ejemplo 123',
+            urbanizacion: '',
+            distrito: 'CALLAO',
+            provincia: 'CALLAO',
+            departamento: 'CALLAO',
+            telefono: '999999999',
+            representante_legal: 'JUAN PEREZ',
+            elaborado_por: 'PEDRO GARCIA',
+            num_planilla: null,
+            afiliados: [
+                { nro: 1, cuspp: '123456ABCDE', nombre: 'GARCIA LOPEZ MARIA', rel_lab: 'S', inicio_rl: 'N', cese_rl: 'N', excep_aporte: '', rem_asegurable: '1,130.00', aporte_oblig: '113.00', comp_trab: '0.00', comp_empl: '0.00', vol_confin: '0.00', vol_sinfin: '0.00', vol_empl: '0.00', prima_seguro: '15.48', comision_afp: '0.00' },
+                { nro: 2, cuspp: '234567BCDEF', nombre: 'MARTINEZ ROJAS CARLOS', rel_lab: 'S', inicio_rl: 'N', cese_rl: 'N', excep_aporte: '', rem_asegurable: '1,130.00', aporte_oblig: '113.00', comp_trab: '0.00', comp_empl: '0.00', vol_confin: '0.00', vol_sinfin: '0.00', vol_empl: '0.00', prima_seguro: '15.48', comision_afp: '0.00' },
+                { nro: 3, cuspp: '345678CDEFG', nombre: 'TORRES DIAZ ANA', rel_lab: 'S', inicio_rl: 'N', cese_rl: 'N', excep_aporte: '', rem_asegurable: '1,130.00', aporte_oblig: '113.00', comp_trab: '0.00', comp_empl: '0.00', vol_confin: '0.00', vol_sinfin: '0.00', vol_empl: '0.00', prima_seguro: '15.48', comision_afp: '0.00' },
+                { nro: 4, cuspp: '456789DEFGH', nombre: 'QUISPE HUAMAN LUIS', rel_lab: 'S', inicio_rl: 'N', cese_rl: 'N', excep_aporte: '', rem_asegurable: '1,130.00', aporte_oblig: '113.00', comp_trab: '0.00', comp_empl: '0.00', vol_confin: '0.00', vol_sinfin: '0.00', vol_empl: '0.00', prima_seguro: '15.48', comision_afp: '0.00' },
+                { nro: 5, cuspp: '567890EFGHI', nombre: 'RAMIREZ SOTO JOSE', rel_lab: 'S', inicio_rl: 'N', cese_rl: 'N', excep_aporte: '', rem_asegurable: '1,130.00', aporte_oblig: '113.00', comp_trab: '0.00', comp_empl: '0.00', vol_confin: '0.00', vol_sinfin: '0.00', vol_empl: '0.00', prima_seguro: '15.48', comision_afp: '0.00' }
+            ]
+        };
+        
+        estadoActual = 'PENDIENTE';
+        mostrarSeccionTabla();
+        cargarDatosTabla();
+        mostrarLoading(false);
+        mostrarExito('Archivo cargado correctamente');
+    }, 1500);
+}
 
-// Get workers for this AFP
-const afpIdx=afpNames.indexOf(r.afp);
-const workers=parsedRows.filter((_,idx)=>idx%afpNames.length===afpIdx);
+// ================================================
+// MANEJO DE SECCIONES
+// ================================================
+function mostrarSeccionTabla() {
+    document.getElementById('seccion-carga').style.display = 'none';
+    document.getElementById('seccion-tabla').style.display = 'block';
+}
 
-// ===== HEADER =====
-// AFP Name top-left
-doc.setFontSize(18);doc.setTextColor(...dk);
-doc.setFont(undefined,'bold');doc.text('AFP'+r.afp,14,14);
-doc.setFontSize(8);doc.setTextColor(100,100,100);
-doc.setFont(undefined,'normal');doc.text('Una empresa del SPP',14,18);
+function iniciarNuevaCarga() {
+    document.getElementById('form-carga').reset();
+    document.getElementById('nombre-archivo').textContent = 'Planilla_Nuevo_Formato_Ejemplo.xlsx';
+    document.getElementById('nombre-archivo').style.background = '#003973';
+    
+    datosActuales = null;
+    estadoActual = 'PENDIENTE';
+    
+    document.getElementById('seccion-carga').style.display = 'block';
+    document.getElementById('seccion-tabla').style.display = 'none';
+}
 
-// Title centered
-doc.setFontSize(13);doc.setTextColor(0);doc.setFont(undefined,'bold');
-doc.text('PLANILLA DE DECLARACIÓN Y PAGO DE APORTES PREVISIONALES',W/2,14,{align:'center'});
+// ================================================
+// TABLA
+// ================================================
+function cargarDatosTabla() {
+    const tbody = document.getElementById('tabla-body');
+    tbody.innerHTML = '';
+    
+    const fila = document.createElement('tr');
+    
+    const estadoClase = estadoActual === 'PENDIENTE' ? 'estado-pendiente' : 'estado-presentada';
+    const presentarDisabled = estadoActual === 'PRESENTADA' ? 'disabled' : '';
+    const ticketDisabled = estadoActual === 'PENDIENTE' ? 'disabled' : '';
+    
+    fila.innerHTML = `
+        <td>${datosActuales.afp}</td>
+        <td>${datosActuales.tipo_trabajador}</td>
+        <td>${datosActuales.rubro}</td>
+        <td>${datosActuales.num_afiliados}</td>
+        <td>${datosActuales.fondo_pensiones}</td>
+        <td>${datosActuales.retenciones}</td>
+        <td><span class="estado-badge ${estadoClase}">${estadoActual}</span></td>
+        <td>${datosActuales.num_planilla || '-'}</td>
+        <td><button class="btn-tabla btn-descargar" onclick="descargarPlanilla()">DESCARGAR</button></td>
+        <td><button class="btn-tabla btn-presentar" onclick="presentarPlanilla()" ${presentarDisabled}>PRESENTAR</button></td>
+        <td><button class="btn-tabla btn-descartar" onclick="descartarPlanilla()">DESCARTAR</button></td>
+        <td><button class="btn-tabla btn-ticket" onclick="mostrarModalTicket()" ${ticketDisabled}>EMITIR</button></td>
+    `;
+    
+    tbody.appendChild(fila);
+}
 
-// AFPnet top-right
-doc.setFontSize(14);doc.setTextColor(...blue);doc.setFont(undefined,'bold');
-doc.text('AFPnet',W-14,12,{align:'right'});
-doc.setFontSize(7);doc.setTextColor(240,160,48);doc.setFont(undefined,'bold');
-doc.text('PAGO FÁCIL',W-14,16,{align:'right'});
+// ================================================
+// GENERAR PDF PLANILLA EN NUEVA VENTANA
+// ================================================
+function descargarPlanilla() {
+    if (!datosActuales) return;
 
-// Line separator
-doc.setDrawColor(...blue);doc.setLineWidth(0.5);doc.line(14,20,W-14,20);
+    const d = datosActuales;
+    const estadoTexto = estadoActual;
 
-// ===== PLANILLA NUMBER & PERIOD =====
-let y=27;
-doc.setFontSize(9);doc.setTextColor(0);doc.setFont(undefined,'normal');
-doc.text('Número de Planilla:',90,y);
-doc.setDrawColor(0);doc.setLineWidth(0.3);doc.rect(135,y-4,40,6);
-doc.setFont(undefined,'bold');doc.text(String(r.nPlan),137,y);
-doc.text('Periodo de Devengue:',195,y);
-doc.rect(235,y-4,30,6);doc.text(selectedPeriodo,237,y);
+    // Generar filas de afiliados
+    let filasAfiliados = '';
+    d.afiliados.forEach(af => {
+        filasAfiliados += `
+        <tr>
+            <td>${af.nro}</td>
+            <td>${af.cuspp}</td>
+            <td>${af.nombre}</td>
+            <td>${af.rel_lab}</td>
+            <td>${af.inicio_rl}</td>
+            <td>${af.cese_rl}</td>
+            <td>${af.excep_aporte}</td>
+            <td class="num">${af.rem_asegurable}</td>
+            <td class="num">${af.aporte_oblig}</td>
+            <td class="num">${af.comp_trab}</td>
+            <td class="num">${af.comp_empl}</td>
+            <td class="num">${af.vol_confin}</td>
+            <td class="num">${af.vol_sinfin}</td>
+            <td class="num">${af.vol_empl}</td>
+            <td class="num">${af.prima_seguro}</td>
+            <td class="num">${af.comision_afp}</td>
+        </tr>`;
+    });
 
-// ===== IDENTIFICACIÓN DEL EMPLEADOR =====
-y=35;
-doc.setFillColor(...blue);doc.setTextColor(...wh);doc.setFontSize(8);doc.setFont(undefined,'bold');
-doc.rect(14,y,W-28,6,'F');doc.text('IDENTIFICACIÓN DEL EMPLEADOR',16,y+4.5);
-y+=6;doc.setTextColor(0);doc.setFont(undefined,'normal');doc.setFontSize(7.5);
+    const html = `<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<title>Planilla de Declaración y Pago de Aportes Previsionales</title>
+<style>
+    @media print {
+        body { margin: 0; }
+        .no-print { display: none !important; }
+    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: Arial, Helvetica, sans-serif; font-size: 11px; color: #000; padding: 20px; background: #fff; position: relative; }
+    .watermark { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%) rotate(-35deg); font-size: 100px; color: rgba(200,200,200,0.15); font-weight: bold; letter-spacing: 15px; pointer-events: none; z-index: 0; white-space: nowrap; }
+    .container { position: relative; z-index: 1; max-width: 1100px; margin: 0 auto; }
+    
+    /* Header */
+    .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; border-bottom: 2px solid #003973; padding-bottom: 10px; }
+    .header-left { display: flex; align-items: center; gap: 8px; }
+    .header-left .logo-text { font-size: 22px; font-weight: bold; }
+    .header-left .logo-text span { color: #003973; }
+    .header-left .logo-text .integra { color: #0066cc; }
+    .header-left .sub { font-size: 9px; color: #666; }
+    .header-center { text-align: center; flex: 1; }
+    .header-center h1 { font-size: 14px; font-weight: bold; color: #000; letter-spacing: 1px; }
+    .header-right { text-align: right; }
+    .header-right .logo-afpnet { font-size: 18px; font-weight: bold; color: #003973; }
+    .header-right .pago-facil { font-size: 9px; color: #e67e00; font-weight: bold; }
+    
+    /* Info línea */
+    .info-line { display: flex; justify-content: center; gap: 40px; margin: 8px 0 15px; font-size: 11px; }
+    .info-line .item { display: flex; align-items: center; gap: 5px; }
+    .info-line .item label { font-weight: bold; }
+    .info-line .item .val { border: 1px solid #999; padding: 3px 12px; min-width: 80px; text-align: center; }
+    
+    /* Sección título */
+    .section-title { font-size: 11px; font-weight: bold; margin: 12px 0 5px; text-decoration: underline; }
+    
+    /* Tabla empleador */
+    .tbl-empleador { width: 100%; border-collapse: collapse; margin-bottom: 12px; font-size: 10px; }
+    .tbl-empleador td { border: 1px solid #999; padding: 4px 8px; }
+    .tbl-empleador .lbl { font-weight: bold; background: #f0f0f0; white-space: nowrap; width: 140px; }
+    
+    /* Resúmenes */
+    .resumenes { display: flex; gap: 15px; margin-bottom: 15px; }
+    .resumen-box { flex: 1; }
+    .resumen-box h4 { font-size: 10px; font-weight: bold; margin-bottom: 5px; text-decoration: underline; }
+    .tbl-resumen { width: 100%; border-collapse: collapse; font-size: 10px; }
+    .tbl-resumen td { border: 1px solid #999; padding: 3px 6px; }
+    .tbl-resumen .concepto { width: 65%; }
+    .tbl-resumen .moneda { width: 10%; text-align: center; font-weight: bold; }
+    .tbl-resumen .monto { width: 25%; text-align: right; }
+    .tbl-resumen .total { font-weight: bold; background: #f5f5f5; }
+    .tbl-otros { width: 100%; border-collapse: collapse; font-size: 10px; }
+    .tbl-otros td { border: 1px solid #999; padding: 3px 6px; }
+    .tbl-otros .lbl { font-weight: normal; width: 60%; }
+    
+    /* Tabla detalle */
+    .tbl-detalle { width: 100%; border-collapse: collapse; font-size: 9px; margin-top: 15px; }
+    .tbl-detalle th { background: #003973; color: #fff; padding: 4px 3px; text-align: center; font-size: 8px; font-weight: bold; border: 1px solid #002255; }
+    .tbl-detalle td { border: 1px solid #999; padding: 3px 4px; text-align: center; }
+    .tbl-detalle td.num { text-align: right; }
+    .tbl-detalle th.grupo { background: #004a99; }
+    
+    /* Botón imprimir */
+    .btn-print { position: fixed; top: 15px; right: 15px; padding: 10px 25px; background: #003973; color: #fff; border: none; border-radius: 6px; font-size: 13px; font-weight: bold; cursor: pointer; z-index: 100; }
+    .btn-print:hover { background: #0056b3; }
+</style>
+</head>
+<body>
 
-// Row 1
-const bw=0.2;doc.setLineWidth(bw);doc.setDrawColor(150);
-doc.rect(14,y,130,6);doc.text('Nombre o R. Social: '+userName.toUpperCase(),16,y+4.2);
-doc.rect(144,y,W-28-130,6);doc.text('RUC: '+userRUC,146,y+4.2);
-y+=6;
-// Row 2
-doc.rect(14,y,(W-28)/2,6);doc.text('Dirección: Av. Principal 123',16,y+4.2);
-doc.rect(14+(W-28)/2,y,(W-28)/2,6);doc.text('Urbanización: Centro',16+(W-28)/2,y+4.2);
-y+=6;
-// Row 3
-const cw=(W-28)/4;
-doc.rect(14,y,cw,6);doc.text('Distrito: LIMA',16,y+4.2);
-doc.rect(14+cw,y,cw,6);doc.text('Provincia: LIMA',16+cw,y+4.2);
-doc.rect(14+cw*2,y,cw,6);doc.text('Departamento: LIMA',16+cw*2,y+4.2);
-doc.rect(14+cw*3,y,cw,6);doc.text('Teléfono: ',16+cw*3,y+4.2);
-y+=6;
-// Row 4
-doc.setFillColor(200,210,240);
-doc.rect(14,y,(W-28)/2,6,'FD');doc.text('Representante Legal: ',16,y+4.2);
-doc.rect(14+(W-28)/2,y,(W-28)/4,6,'FD');doc.text('Elaborado por: ',16+(W-28)/2,y+4.2);
-doc.rect(14+(W-28)*3/4,y,(W-28)/4,6,'FD');doc.text('Teléfono: ',16+(W-28)*3/4,y+4.2);
+<div class="watermark">${estadoTexto}</div>
 
-// ===== THREE SUMMARY SECTIONS =====
-y+=14;
-const secW=85,gap=7,sx1=14,sx2=sx1+secW+gap,sx3=sx2+secW+gap;
+<button class="btn-print no-print" onclick="window.print()">🖨️ Imprimir / Guardar PDF</button>
 
-// -- RESUMEN DE APORTES AL FONDO --
-doc.setFillColor(...blue);doc.setTextColor(...wh);doc.setFontSize(7.5);doc.setFont(undefined,'bold');
-doc.rect(sx1,y,secW,5,'F');doc.text('RESUMEN DE APORTES AL FONDO',sx1+2,y+3.7);
-let ay=y+5;doc.setTextColor(0);doc.setFont(undefined,'normal');doc.setFontSize(7);
-const fondoTotal=parseFloat(r.fondo);
-const aportes=[
-    ['Aporte Obligatorio','S/.',r.fondo],
-    ['Aporte Complementario - Trabajador','S/.','0.00'],
-    ['Aporte Complementario - Empleador','S/.','0.00'],
-    ['Aporte Voluntario con Fin Previsional','S/.','0.00'],
-    ['Aporte Voluntario sin Fin Previsional','S/.','0.00'],
-    ['Aporte Voluntario del Empleador','S/.','0.00'],
-    ['Sub-Total Fondo de Pensiones','S/.',r.fondo],
-    ['Intereses Moratorios','S/.','0.00'],
-];
-aportes.forEach(a=>{
-    doc.rect(sx1,ay,52,5);doc.text(a[0],sx1+1,ay+3.5);
-    doc.rect(sx1+52,ay,10,5);doc.text(a[1],sx1+53,ay+3.5);
-    doc.rect(sx1+62,ay,23,5);doc.text(a[2],sx1+83,ay+3.5,{align:'right'});
-    ay+=5;
-});
-doc.setFont(undefined,'bold');doc.setFontSize(7.5);
-doc.rect(sx1,ay,52,6);doc.text('Total Fondo Pensiones',sx1+1,ay+4.2);
-doc.rect(sx1+52,ay,10,6);doc.text('S/.',sx1+53,ay+4.2);
-doc.rect(sx1+62,ay,23,6);doc.text(r.fondo,sx1+83,ay+4.2,{align:'right'});
+<div class="container">
+    <!-- HEADER -->
+    <div class="header">
+        <div class="header-left">
+            <div>
+                <div class="logo-text"><span>AFP</span><span class="integra">Integra</span></div>
+                <div class="sub">Una empresa <b>sura</b></div>
+            </div>
+        </div>
+        <div class="header-center">
+            <h1>PLANILLA DE DECLARACIÓN Y PAGO DE APORTES PREVISIONALES</h1>
+        </div>
+        <div class="header-right">
+            <div class="logo-afpnet">AFPnet</div>
+            <div class="pago-facil">PAGO FÁCIL</div>
+        </div>
+    </div>
 
-// -- RESUMEN DE RETENCIONES Y RETRIBUCIONES --
-doc.setFillColor(...blue);doc.setTextColor(...wh);doc.setFontSize(7.5);
-doc.rect(sx2,y,secW,5,'F');doc.text('RESUMEN DE RETENCIONES Y RETRIBUCIONES A',sx2+2,y+3.7);
-let ry=y+5;doc.setTextColor(0);doc.setFont(undefined,'normal');doc.setFontSize(7);
-const retTotal=parseFloat(r.ret);
-const rets=[
-    ['Prima de Seguro Previsional','S/.',r.ret],
-    ['Comisión AFP','S/.','0.00'],
-    ['Sub-total Retenciones y Retribuciones','S/.',r.ret],
-    ['Intereses Moratorios','S/.','0.00'],
-];
-rets.forEach(rt=>{
-    doc.rect(sx2,ry,52,5);doc.text(rt[0],sx2+1,ry+3.5);
-    doc.rect(sx2+52,ry,10,5);doc.text(rt[1],sx2+53,ry+3.5);
-    doc.rect(sx2+62,ry,23,5);doc.text(rt[2],sx2+83,ry+3.5,{align:'right'});
-    ry+=5;
-});
-doc.setFont(undefined,'bold');doc.setFontSize(7.5);
-doc.rect(sx2,ry,52,6);doc.text('Total Retenciones y Retribuciones',sx2+1,ry+4.2);
-doc.rect(sx2+52,ry,10,6);doc.text('S/.',sx2+53,ry+4.2);
-doc.rect(sx2+62,ry,23,6);doc.text(r.ret,sx2+83,ry+4.2,{align:'right'});
+    <!-- Info planilla -->
+    <div class="info-line">
+        <div class="item">
+            <label>Número de Planilla:</label>
+            <span class="val">${d.num_planilla || ''}</span>
+        </div>
+        <div class="item">
+            <label>Periodo de Devengue:</label>
+            <span class="val">${d.periodo}</span>
+        </div>
+    </div>
 
-// -- OTROS --
-doc.setFillColor(...blue);doc.setTextColor(...wh);doc.setFontSize(7.5);
-doc.rect(sx3,y,secW,5,'F');doc.text('OTROS',sx3+2,y+3.7);
-let oy=y+5;doc.setTextColor(0);doc.setFont(undefined,'normal');doc.setFontSize(7);
-const otros=[
-    ['AFP',r.afp],['Tipo de Trabajador','DEPENDIENTE'],['Tipo de Riesgo','NORMAL'],
-    ['Nro. de Afiliados Declarados',String(r.afil)],['Estado de la Planilla',r.estado]
-];
-otros.forEach(o=>{
-    doc.rect(sx3,oy,48,5);doc.text(o[0],sx3+1,oy+3.5);
-    doc.rect(sx3+48,oy,37,5);doc.text(o[1],sx3+49,oy+3.5);
-    oy+=5;
-});
+    <!-- IDENTIFICACIÓN DEL EMPLEADOR -->
+    <div class="section-title">IDENTIFICACIÓN DEL EMPLEADOR</div>
+    <table class="tbl-empleador">
+        <tr>
+            <td class="lbl">Nombre o R. Social:</td>
+            <td colspan="3">${d.razon_social}</td>
+            <td class="lbl">RUC:</td>
+            <td>${d.ruc}</td>
+        </tr>
+        <tr>
+            <td class="lbl">Dirección:</td>
+            <td colspan="3">${d.direccion}</td>
+            <td class="lbl">Urbanización:</td>
+            <td>${d.urbanizacion}</td>
+        </tr>
+        <tr>
+            <td class="lbl">Distrito:</td>
+            <td>${d.distrito}</td>
+            <td class="lbl">Provincia:</td>
+            <td>${d.provincia}</td>
+            <td class="lbl">Departamento:</td>
+            <td>${d.departamento}</td>
+        </tr>
+        <tr>
+            <td class="lbl">Representante Legal:</td>
+            <td colspan="2">${d.representante_legal}</td>
+            <td class="lbl">Elaborado por:</td>
+            <td colspan="2">${d.elaborado_por}</td>
+        </tr>
+    </table>
 
-// ===== WATERMARK =====
-doc.setTextColor(220,220,220);doc.setFontSize(60);doc.setFont(undefined,'bold');
-doc.text(r.estado,W/2,H/2+10,{align:'center',angle:35});
+    <!-- RESÚMENES -->
+    <div class="resumenes">
+        <div class="resumen-box">
+            <h4>RESUMEN DE APORTES AL FONDO</h4>
+            <table class="tbl-resumen">
+                <tr><td class="concepto">Aporte Obligatorio</td><td class="moneda">S/.</td><td class="monto">${d.fondo_pensiones}</td></tr>
+                <tr><td class="concepto">Aporte Complementario - Trabajador</td><td class="moneda">S/.</td><td class="monto">0.00</td></tr>
+                <tr><td class="concepto">Aporte Complementario - Empleador</td><td class="moneda">S/.</td><td class="monto">0.00</td></tr>
+                <tr><td class="concepto">Aporte Voluntario con Fin Previsional</td><td class="moneda">S/.</td><td class="monto">0.00</td></tr>
+                <tr><td class="concepto">Aporte Voluntario sin Fin Previsional</td><td class="moneda">S/.</td><td class="monto">0.00</td></tr>
+                <tr><td class="concepto">Aporte Voluntario del Empleador</td><td class="moneda">S/.</td><td class="monto">0.00</td></tr>
+                <tr><td class="concepto">Sub-Total Fondo de Pensiones</td><td class="moneda">S/.</td><td class="monto">${d.fondo_pensiones}</td></tr>
+                <tr><td class="concepto">Intereses Moratorios</td><td class="moneda">S/.</td><td class="monto">0.00</td></tr>
+                <tr class="total"><td class="concepto"><b>Total Fondo Pensiones</b></td><td class="moneda"><b>S/.</b></td><td class="monto"><b>${d.fondo_pensiones}</b></td></tr>
+            </table>
+        </div>
+        <div class="resumen-box">
+            <h4>RESUMEN DE RETENCIONES Y RETRIBUCIONES A</h4>
+            <table class="tbl-resumen">
+                <tr><td class="concepto">Prima de Seguro Previsional</td><td class="moneda">S/.</td><td class="monto">${d.prima_seguro || d.retenciones}</td></tr>
+                <tr><td class="concepto">Comisión AFP</td><td class="moneda">S/.</td><td class="monto">${d.comision_afp}</td></tr>
+                <tr><td class="concepto">Sub-total Retenciones y Retribuciones</td><td class="moneda">S/.</td><td class="monto">${d.retenciones}</td></tr>
+                <tr><td class="concepto">Intereses Moratorios</td><td class="moneda">S/.</td><td class="monto">0.00</td></tr>
+                <tr class="total"><td class="concepto"><b>Total Retenciones y Retribuciones</b></td><td class="moneda"><b>S/.</b></td><td class="monto"><b>${d.retenciones}</b></td></tr>
+            </table>
+        </div>
+        <div class="resumen-box">
+            <h4>OTROS</h4>
+            <table class="tbl-otros">
+                <tr><td class="lbl">AFP</td><td>${d.afp}</td></tr>
+                <tr><td class="lbl">Tipo de Trabajador</td><td>${d.tipo_trabajador_texto}</td></tr>
+                <tr><td class="lbl">Tipo de Riesgo</td><td>${d.tipo_riesgo}</td></tr>
+                <tr><td class="lbl">Nro. de Afiliados Declarados</td><td>${d.num_afiliados}</td></tr>
+                <tr><td class="lbl">Estado de la Planilla</td><td>${estadoTexto}</td></tr>
+            </table>
+        </div>
+    </div>
 
-// ===== WORKER DETAIL TABLE =====
-const tblY=Math.max(ay,ry,oy)+12;
-const headers=[['Nro','CUSPP','Nombre','Rel.\nLab.','Inicio\nRL','Cese\nRL','Excep.\naportar','Remuneración\nAsegurable','Aporte\nObligatorio','Ap. Comp.\nTrabajador','Ap. Comp.\nEmpleador','Ap. Vol.\nCon Fin','Ap. Vol.\nSin Fin','Ap. Vol.\nEmpleador','Prima de\nSeguro','Comisión\nAFP']];
+    <!-- TABLA DETALLE -->
+    <table class="tbl-detalle">
+        <thead>
+            <tr>
+                <th rowspan="2">Nro</th>
+                <th rowspan="2">CUSPP</th>
+                <th rowspan="2">Nombre</th>
+                <th rowspan="2">Rel. Lab.</th>
+                <th rowspan="2">Inicio RL</th>
+                <th rowspan="2">Cese RL</th>
+                <th rowspan="2">Excep. de aporte</th>
+                <th rowspan="2">Remuneración Asegurable</th>
+                <th rowspan="2">Aporte Obligatorio</th>
+                <th colspan="2" class="grupo">Aportes Complementarios</th>
+                <th colspan="3" class="grupo">Aportes Voluntarios</th>
+                <th rowspan="2">Prima de Seguro</th>
+                <th rowspan="2">Comisión AFP</th>
+            </tr>
+            <tr>
+                <th>Trabajador</th>
+                <th>Empleador</th>
+                <th>Con Fin Prev.</th>
+                <th>Sin Fin Prev.</th>
+                <th>Empleador</th>
+            </tr>
+        </thead>
+        <tbody>
+            ${filasAfiliados}
+        </tbody>
+    </table>
+</div>
 
-const bodyRows=workers.map((w,wi)=>{
-    const cuspp=w[1]||'';
-    const nombre=((w[4]||'')+' '+(w[5]||'')+' '+(w[6]||'')).trim()||'Trabajador '+(wi+1);
-    const rem=parseFloat(w[11])||1000;
-    const aporte=(rem*0.1).toFixed(2);
-    const prima=(rem*0.0154).toFixed(2);
-    return[String(wi+1),cuspp,nombre,w[7]||'S','','N','N',rem.toFixed(2),aporte,'0.00','0.00','0.00','0.00','0.00',prima,'0.00'];
-});
+</body>
+</html>`;
 
-doc.autoTable({
-    head:headers,body:bodyRows,startY:tblY,
-    theme:'grid',
-    styles:{fontSize:6.5,cellPadding:1.5,lineColor:[150,150,150],lineWidth:0.2,textColor:[0,0,0]},
-    headStyles:{fillColor:blue,textColor:wh,fontSize:6,fontStyle:'bold',halign:'center',valign:'middle',cellPadding:1},
-    columnStyles:{
-        0:{halign:'center',cellWidth:8},
-        1:{cellWidth:22},
-        2:{cellWidth:35},
-        3:{halign:'center',cellWidth:10},
-        4:{halign:'center',cellWidth:14},
-        5:{halign:'center',cellWidth:10},
-        6:{halign:'center',cellWidth:12},
-        7:{halign:'right',cellWidth:20},
-        8:{halign:'right',cellWidth:16},
-        9:{halign:'right',cellWidth:16},
-        10:{halign:'right',cellWidth:16},
-        11:{halign:'right',cellWidth:16},
-        12:{halign:'right',cellWidth:16},
-        13:{halign:'right',cellWidth:16},
-        14:{halign:'right',cellWidth:16},
-        15:{halign:'right',cellWidth:16},
-    },
-    margin:{left:14,right:14},
-    didDrawPage:function(data){
-        doc.setFontSize(7);doc.setTextColor(150);
-        doc.text('Documento generado por AFPnet - '+new Date().toLocaleString('es-PE'),14,H-5);
+    const ventana = window.open('', '_blank');
+    ventana.document.write(html);
+    ventana.document.close();
+    mostrarExito('Planilla generada correctamente');
+}
+
+// ================================================
+// ACCIONES DE PLANILLA
+// ================================================
+function presentarPlanilla() {
+    if (!confirm('¿Está seguro que desea presentar esta planilla?')) {
+        return;
+    }
+    
+    mostrarLoading(true);
+    
+    setTimeout(() => {
+        const numPlanilla = 'PL' + Date.now();
+        datosActuales.num_planilla = numPlanilla;
+        estadoActual = 'PRESENTADA';
+        
+        cargarDatosTabla();
+        mostrarLoading(false);
+        mostrarExito('Planilla presentada exitosamente');
+    }, 1000);
+}
+
+function descartarPlanilla() {
+    if (!confirm('¿Está seguro que desea descartar esta planilla? Esta acción no se puede deshacer.')) {
+        return;
+    }
+    
+    mostrarLoading(true);
+    
+    setTimeout(() => {
+        mostrarLoading(false);
+        mostrarExito('Planilla descartada exitosamente');
+        
+        setTimeout(() => {
+            iniciarNuevaCarga();
+        }, 1500);
+    }, 1000);
+}
+
+// ================================================
+// MODAL DE TICKET
+// ================================================
+function mostrarModalTicket() {
+    const modal = document.getElementById('modal-ticket');
+    
+    document.getElementById('ticket-devengue').textContent = datosActuales.periodo || '2025-01';
+    document.getElementById('ticket-ruc').textContent = datosActuales.ruc || '';
+    document.getElementById('ticket-razon').textContent = datosActuales.razon_social || '';
+    document.getElementById('ticket-numero').textContent = datosActuales.num_planilla || '';
+    document.getElementById('ticket-fondo').textContent = datosActuales.fondo_pensiones || '565.00';
+    document.getElementById('ticket-retenciones').textContent = datosActuales.retenciones || '77.40';
+    
+    const fechaPago = new Date();
+    fechaPago.setDate(fechaPago.getDate() + 3);
+    const fechaStr = formatearFecha(fechaPago);
+    document.getElementById('ticket-fecha').textContent = fechaStr;
+    
+    modal.classList.add('activo');
+}
+
+function cerrarModal() {
+    const modal = document.getElementById('modal-ticket');
+    modal.classList.remove('activo');
+}
+
+// ================================================
+// GENERAR PDF TICKET EN NUEVA VENTANA
+// ================================================
+function emitirTicket() {
+    cerrarModal();
+
+    if (!datosActuales) return;
+
+    const d = datosActuales;
+    const numTicket = d.num_planilla || ('TK' + Date.now());
+    const fondo = parseFloat(d.fondo_pensiones) || 565.00;
+    const ret = parseFloat(d.retenciones) || 77.40;
+    const total = (fondo + ret).toFixed(2);
+
+    // Generar 3 fechas de pago consecutivas
+    const fechaBase = new Date();
+    fechaBase.setDate(fechaBase.getDate() + 3);
+    const fechas = [];
+    for (let i = 0; i < 3; i++) {
+        const f = new Date(fechaBase);
+        f.setDate(f.getDate() + i);
+        fechas.push(formatearFecha(f));
+    }
+
+    const ahora = new Date();
+    const fechaEmision = formatearFecha(ahora);
+    const horaEmision = ahora.toLocaleTimeString('es-PE', { hour: '2-digit', minute: '2-digit', hour12: true });
+
+    // Fecha límite (1 mes después)
+    const fechaLimite = new Date(fechaBase);
+    fechaLimite.setMonth(fechaLimite.getMonth() + 1);
+    const fechaLimiteStr = formatearFecha(fechaLimite);
+
+    const html = `<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<title>Ticket de Pago - AFP ${d.afp}</title>
+<style>
+    @media print {
+        body { margin: 0; }
+        .no-print { display: none !important; }
+    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: Arial, Helvetica, sans-serif; font-size: 12px; color: #000; padding: 30px; background: #fff; }
+    .container { max-width: 700px; margin: 0 auto; border: 2px solid #003973; padding: 30px; }
+    
+    /* Header */
+    .header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 20px; padding-bottom: 15px; border-bottom: 2px solid #003973; }
+    .header-left .logo { font-size: 22px; font-weight: bold; color: #003973; }
+    .header-left .pago-facil { font-size: 10px; color: #e67e00; font-weight: bold; }
+    .header-right { text-align: center; }
+    .header-right h1 { font-size: 20px; font-weight: bold; color: #000; margin-bottom: 3px; }
+    .header-right h2 { font-size: 14px; font-weight: bold; color: #003973; }
+    
+    /* Info empleador */
+    .info-emp { margin-bottom: 20px; font-size: 12px; line-height: 1.8; }
+    .info-emp .row { display: flex; gap: 10px; }
+    .info-emp .lbl { font-weight: bold; min-width: 120px; }
+    
+    /* Tabla de montos */
+    .tbl-montos { width: 100%; border-collapse: collapse; margin: 15px 0 20px; }
+    .tbl-montos th { background: #003973; color: #fff; padding: 10px 12px; text-align: center; font-size: 11px; font-weight: bold; border: 1px solid #002255; }
+    .tbl-montos td { padding: 8px 12px; text-align: center; border: 1px solid #999; font-size: 12px; }
+    .tbl-montos tr:first-child td { font-weight: bold; }
+    .tbl-montos .total { font-weight: bold; }
+    
+    /* Fechas emisión */
+    .fechas-emision { display: flex; justify-content: space-between; margin: 15px 0; font-size: 11px; }
+    .fechas-emision .item span { font-weight: bold; }
+    
+    /* Notas */
+    .nota { margin: 12px 0; font-size: 11px; line-height: 1.6; color: #333; }
+    .nota-bancos { margin: 12px 0; font-size: 11px; }
+    .nota-bancos ul { margin: 5px 0 5px 20px; }
+    .nota-bancos li { padding: 2px 0; }
+    .nota-final { margin-top: 12px; font-size: 11px; color: #333; line-height: 1.6; }
+    
+    /* Botón imprimir */
+    .btn-print { position: fixed; top: 15px; right: 15px; padding: 10px 25px; background: #003973; color: #fff; border: none; border-radius: 6px; font-size: 13px; font-weight: bold; cursor: pointer; z-index: 100; }
+    .btn-print:hover { background: #0056b3; }
+</style>
+</head>
+<body>
+
+<button class="btn-print no-print" onclick="window.print()">🖨️ Imprimir / Guardar PDF</button>
+
+<div class="container">
+    <!-- HEADER -->
+    <div class="header">
+        <div class="header-left">
+            <div class="logo">AFPnet</div>
+            <div class="pago-facil">PAGO FÁCIL</div>
+        </div>
+        <div class="header-right">
+            <h1>TICKET DE PAGO</h1>
+            <h2>AFP ${d.afp} - N° ${numTicket}</h2>
+        </div>
+    </div>
+
+    <!-- Info Empleador -->
+    <div class="info-emp">
+        <div class="row"><span class="lbl">Empleador</span><span>: ${d.razon_social}</span></div>
+        <div class="row"><span class="lbl">N° de RUC</span><span>: ${d.ruc}</span></div>
+        <div class="row"><span class="lbl">Monto a Pagar</span><span>:</span></div>
+    </div>
+
+    <!-- Tabla Montos -->
+    <table class="tbl-montos">
+        <thead>
+            <tr>
+                <th>Fecha de Pago</th>
+                <th>Fondo de Pensiones</th>
+                <th>Retenciones y Retribuciones</th>
+                <th>Total</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td><b>${fechas[0]}</b></td>
+                <td><b>${fondo.toFixed(2)}</b></td>
+                <td><b>${ret.toFixed(2)}</b></td>
+                <td><b>${total}</b></td>
+            </tr>
+            <tr>
+                <td>${fechas[1]}</td>
+                <td>${fondo.toFixed(2)}</td>
+                <td>${ret.toFixed(2)}</td>
+                <td>${total}</td>
+            </tr>
+            <tr>
+                <td>${fechas[2]}</td>
+                <td>${fondo.toFixed(2)}</td>
+                <td>${ret.toFixed(2)}</td>
+                <td>${total}</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <!-- Fechas de emisión -->
+    <div class="fechas-emision">
+        <div class="item"><span>Emitido</span> : ${fechaEmision} ${horaEmision}</div>
+        <div class="item"><span>Impreso</span>: ${fechaEmision} ${horaEmision}</div>
+    </div>
+
+    <!-- Notas -->
+    <p class="nota">Los montos corresponden a las fechas indicadas. Si desea conocer los montos a pagar en una fecha distinta, emita el ticket indicando la nueva fecha de pago.</p>
+
+    <p class="nota">El ticket se puede pagar desde el ${fechas[0]} a las 3:00PM hasta el ${fechaLimiteStr}. Para pagar después, será necesario emitirlo nuevamente.</p>
+
+    <div class="nota-bancos">
+        <p>Puede pagar este ticket en los siguientes bancos:</p>
+        <ul>
+            <li>BANBIF</li>
+            <li>BBVA - WEB Y AGENTES</li>
+            <li>SCOTIABANK</li>
+        </ul>
+    </div>
+
+    <p class="nota-final">Para efectuar el pago basta indicar la AFP y el número de ticket, no es necesario imprimir el presente formato.</p>
+</div>
+
+</body>
+</html>`;
+
+    const ventana = window.open('', '_blank');
+    ventana.document.write(html);
+    ventana.document.close();
+    mostrarExito('Ticket generado correctamente');
+}
+
+// ================================================
+// UTILIDADES
+// ================================================
+function mostrarLoading(mostrar) {
+    const loading = document.getElementById('loading');
+    if (loading) {
+        loading.style.display = mostrar ? 'flex' : 'none';
+    }
+}
+
+function mostrarExito(mensaje) {
+    const div = document.createElement('div');
+    div.className = 'mensaje-exito';
+    div.textContent = mensaje;
+    document.body.appendChild(div);
+    
+    setTimeout(() => {
+        div.style.animation = 'slideInRight 0.3s ease-out reverse';
+        setTimeout(() => {
+            div.remove();
+        }, 300);
+    }, 3000);
+}
+
+function mostrarAlerta(mensaje, tipo = 'info') {
+    alert(mensaje);
+}
+
+function formatearFecha(fecha) {
+    const dia = String(fecha.getDate()).padStart(2, '0');
+    const mes = String(fecha.getMonth() + 1).padStart(2, '0');
+    const anio = fecha.getFullYear();
+    return `${dia}/${mes}/${anio}`;
+}
+
+// ================================================
+// CERRAR MODAL AL HACER CLICK FUERA
+// ================================================
+document.addEventListener('click', function(e) {
+    const modal = document.getElementById('modal-ticket');
+    if (e.target === modal) {
+        cerrarModal();
     }
 });
 
-doc.save('Planilla_'+r.afp+'_'+selectedPeriodo+'.pdf');
-}
-
-// ===== PRESENTAR =====
-function presentar(i){if(confirm('¿Presentar la declaración de '+planillaData[i].afp+'?')){planillaData[i].estado='PRESENTADA';renderTbl();showO('Declaración de '+planillaData[i].afp+' presentada correctamente.')}}
-
-// ===== DESCARTAR =====
-function descartar(i){if(confirm('¿Descartar la planilla de '+planillaData[i].afp+'?')){planillaData.splice(i,1);renderTbl();if(!planillaData.length)document.getElementById('results').classList.remove('vis')}}
-
-// ===== EMITIR =====
-let eIdx=-1;
-function emitir(i){
-eIdx=i;const r=planillaData[i];
-const td=new Date().toLocaleDateString('es-PE',{day:'2-digit',month:'2-digit',year:'numeric'});
-document.getElementById('emit-ig').innerHTML=`
-    <div class="il">Devengue:</div><div class="iv">${selectedPeriodo}</div>
-    <div class="il">RUC:</div><div class="iv">${userRUC}</div>
-    <div class="il">Razón Social:</div><div class="iv blur">EMPRESA EJEMPLO S.A.C.</div>
-    <div class="il">AFP:</div><div class="iv">${r.afp}</div>
-    <div class="il">Fecha de Pago:</div><div class="iv">${td}</div>
-    <div class="il">Número de Planilla:</div><div class="iv">${r.nPlan}</div>
-    <div class="il">Total monto fondo de pensiones (S/.):</div><div class="iv">${r.fondo}</div>
-    <div class="il">Total retenciones y retribuciones (S/.):</div><div class="iv">${r.ret}</div>`;
-openM('mo-emit');
-}
-
-document.getElementById('btn-do-emit').onclick=()=>{
-if(eIdx<0)return;
-const r=planillaData[eIdx];
-const tNum=Math.floor(2400000000+Math.random()*99999999);
-r.ticket=tNum;
-const now=new Date();
-const td=now.toLocaleDateString('es-PE',{day:'2-digit',month:'2-digit',year:'numeric'});
-const nm=new Date(now);nm.setMonth(nm.getMonth()+1);
-const nd=nm.toLocaleDateString('es-PE',{day:'2-digit',month:'2-digit',year:'numeric'});
-closeM('mo-emit');
-document.getElementById('ticket-mb').innerHTML=`
-    <div class="ig">
-        <div class="il" style="font-weight:700">Número de ticket:</div><div class="iv" style="font-size:16px;color:var(--blue)">${tNum}</div>
-        <div class="il">Devengue:</div><div class="iv">${selectedPeriodo}</div>
-        <div class="il">RUC:</div><div class="iv">${userRUC}</div>
-        <div class="il">Razón Social:</div><div class="iv blur">EMPRESA EJEMPLO S.A.C.</div>
-        <div class="il">AFP:</div><div class="iv">${r.afp}</div>
-        <div class="il">Fecha de Pago:</div><div class="iv">${td}</div>
-        <div class="il">Fecha de Emisión:</div><div class="iv">${td}</div>
-        <div class="il">Número de Planilla:</div><div class="iv">${r.nPlan}</div>
-        <div class="il">Total Monto Fondo de Pensiones (S/.):</div><div class="iv">${r.fondo}</div>
-        <div class="il">Total Retenciones y Retribuciones (S/.):</div><div class="iv">${r.ret}</div>
-    </div>
-    <div class="tn">Este ticket se puede pagar desde el ${td} a las 3:00PM hasta el ${nd}. Para pagar después, será necesario emitirlo nuevamente.<br><br>Puede pagar este ticket en los siguientes bancos:</div>
-    <ul class="tb-list"><li>BANBIF</li><li>BBVA - WEB Y AGENTES</li><li>SCOTIABANK</li></ul>
-    <p class="tfn">Para efectuar el pago basta indicar la AFP y el número de ticket, no es necesario imprimir el presente formato.</p>`;
-window._tk={tNum,r,td,nd,per:selectedPeriodo};
-openM('mo-ticket');
-};
-
-// ===== PRINT TICKET PDF (Professional Ticket de Pago) =====
-document.getElementById('btn-print').onclick=()=>{
-const t=window._tk;if(!t)return;
-const{jsPDF}=window.jspdf;const doc=new jsPDF();
-const W=210,blue=[28,57,151],wh=[255,255,255];
-const total=(parseFloat(t.r.fondo)+parseFloat(t.r.ret)).toFixed(2);
-
-// Generate 3 consecutive payment dates
-const baseDate=new Date();
-const dates=[];
-for(let d=0;d<3;d++){
-    const dt=new Date(baseDate);dt.setDate(dt.getDate()+d);
-    dates.push(dt.toLocaleDateString('es-PE',{day:'2-digit',month:'2-digit',year:'numeric'}));
-}
-const emitTime=baseDate.toLocaleDateString('es-PE',{day:'2-digit',month:'2-digit',year:'numeric'})+' '+baseDate.toLocaleTimeString('es-PE',{hour:'2-digit',minute:'2-digit',hour12:false});
-
-// ===== HEADER BAR =====
-doc.setFillColor(220,235,250);doc.rect(0,0,W,8,'F');
-
-// ===== AFPNET LOGO (top left) =====
-doc.setFontSize(16);doc.setTextColor(...blue);doc.setFont(undefined,'bold');
-doc.text('AFPnet',18,22);
-doc.setFontSize(7);doc.setTextColor(240,160,48);
-doc.text('PAGO FÁCIL',18,26);
-
-// ===== TITLE =====
-doc.setFontSize(18);doc.setTextColor(...blue);doc.setFont(undefined,'bold');
-doc.text('TICKET DE PAGO',W/2,22,{align:'center'});
-doc.setFontSize(12);
-doc.text('AFP '+t.r.afp+' - N° '+t.tNum,W/2,30,{align:'center'});
-
-// User avatar (top right) - small circle
-doc.setFillColor(...blue);doc.circle(W-20,20,6,'F');
-doc.setTextColor(...wh);doc.setFontSize(8);
-doc.text(uName.substring(0,2).toUpperCase(),W-23,22);
-
-// Line separator
-doc.setDrawColor(...blue);doc.setLineWidth(0.5);doc.line(14,35,W-14,35);
-
-// ===== EMPLOYER INFO =====
-let y=44;
-doc.setFontSize(10);doc.setTextColor(0);
-doc.setFont(undefined,'normal');doc.text('Empleador',18,y);
-doc.setFont(undefined,'bold');
-doc.setFillColor(100,130,200);doc.rect(70,y-4,90,6,'F');
-doc.setTextColor(...wh);doc.text(uName.toUpperCase(),72,y);
-y+=9;
-doc.setTextColor(0);doc.setFont(undefined,'normal');doc.text('N° de RUC',18,y);
-doc.setFont(undefined,'bold');doc.text(userRUC,70,y);
-y+=9;
-doc.setFont(undefined,'normal');doc.text('Monto a Pagar',18,y);
-doc.setFont(undefined,'bold');doc.text(':',60,y);
-y+=4;
-
-// ===== PAYMENT TABLE =====
-const tblX=55,tblW=120;
-y+=4;
-doc.autoTable({
-    head:[['Fecha\nde Pago','Fondo\nde Pensiones','Retenciones y\nRetribuciones','Total']],
-    body:[
-        [dates[0],t.r.fondo,t.r.ret,total],
-        [dates[1],t.r.fondo,t.r.ret,total],
-        [dates[2],t.r.fondo,t.r.ret,total],
-    ],
-    startY:y,
-    theme:'grid',
-    styles:{fontSize:9,cellPadding:3,textColor:[0,0,0],lineColor:[150,150,150],lineWidth:0.3,halign:'right'},
-    headStyles:{fillColor:[240,240,240],textColor:[0,0,0],fontStyle:'bold',halign:'center',valign:'middle'},
-    columnStyles:{0:{halign:'center',cellWidth:30}},
-    margin:{left:tblX,right:W-tblX-tblW},
-    tableWidth:tblW,
+// ================================================
+// ESC PARA CERRAR MODAL
+// ================================================
+document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape') {
+        cerrarModal();
+    }
 });
-
-// ===== EMITTED / PRINTED =====
-y=doc.lastAutoTable.finalY+10;
-doc.setFontSize(9);doc.setFont(undefined,'bold');doc.setTextColor(0);
-doc.text('Emitido',18,y);doc.setFont(undefined,'normal');
-doc.text(':   '+emitTime,42,y);
-doc.setFont(undefined,'bold');doc.text('Impreso:',110,y);
-doc.setFont(undefined,'normal');doc.text(emitTime,133,y);
-
-// ===== SEPARATOR =====
-y+=8;doc.setDrawColor(0);doc.setLineWidth(0.3);doc.line(14,y,W-14,y);
-
-// ===== NOTES =====
-y+=8;doc.setFontSize(9);doc.setFont(undefined,'normal');
-doc.text('Los montos corresponden a las fechas indicadas. Si desea conocer los montos a pagar en una fecha distinta,',18,y);
-y+=5;doc.text('emita el ticket indicando la nueva fecha de pago.',18,y);
-
-y+=10;doc.setFont(undefined,'bold');
-doc.text('El ticket se puede pagar desde el '+dates[0]+' a las 3:00PM hasta el '+t.nd+'. Para pagar después, será',18,y);
-y+=5;doc.text('necesario emitirlo nuevamente.',18,y);
-
-y+=10;doc.setFont(undefined,'normal');
-doc.text('Puede pagar este ticket en los siguientes bancos:',18,y);
-y+=6;doc.setFont(undefined,'bold');
-doc.text('- BANBIF',22,y);y+=5;
-doc.text('- BBVA - WEB Y AGENTES',22,y);y+=5;
-doc.text('- SCOTIABANK',22,y);
-
-y+=10;doc.setFont(undefined,'bold');
-doc.text('Para efectuar el pago basta indicar la AFP y el número de ticket, no es necesario imprimir el presente formato.',18,y);
-
-// ===== FOOTER =====
-doc.setFontSize(7);doc.setTextColor(150);doc.setFont(undefined,'normal');
-doc.text('Documento generado por AFPnet - '+new Date().toLocaleString('es-PE'),14,287);
-
-doc.save('Ticket_'+t.r.afp+'_'+t.tNum+'.pdf');
-};
-
-// ===== NUEVA CARGA =====
-function nuevaCarga(){document.getElementById('results').classList.remove('vis');planillaData=[];parsedRows=[];resetF();document.getElementById('sel-per').value='';document.getElementById('chk-sem').checked=false;hideE();hideO();scrollTo({top:0,behavior:'smooth'})}
-
-// ===== MODALS =====
-function openM(id){document.getElementById(id).classList.add('vis')}
-function closeM(id){document.getElementById(id).classList.remove('vis')}

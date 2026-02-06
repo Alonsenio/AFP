@@ -1,0 +1,238 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: Arial, Helvetica, sans-serif;
+    background-color: #f5f5f5;
+}
+
+/* Ajuste para el contenedor principal con sidebar */
+.container {
+    margin-left: 235px; /* Espacio para el sidebar */
+    margin-top: 54px; /* Espacio para el topbar */
+    background-color: white;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    min-height: calc(100vh - 60px);
+}
+
+/* Header */
+.page-banner {
+    background-color: #1c3997;
+    color: #fff;
+    padding: 14px 24px;
+    border-radius: 6px;
+    font-size: 15px;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+    margin-top: 0;
+}
+.page-banner span{opacity:.7}
+
+.header h1 {
+    color: #ffffff;
+    font-size: 18px;
+    font-weight: bold;
+    margin: 0;
+}
+
+/* Filtros Container */
+.filtros-container {
+    background-color: #ffffff;
+    padding: 30px;
+}
+
+.filtros-title {
+    color: #4a5568;
+    font-size: 16px;
+    font-weight: bold;
+    margin-bottom: 20px;
+}
+
+/* Form */
+.form-filtros {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 18px;
+}
+
+.form-group {
+    display: grid;
+    grid-template-columns: 150px 1fr;
+    align-items: center;
+    gap: 15px;
+}
+
+.form-group label {
+    color: #2d3748;
+    font-size: 14px;
+    font-weight: 500;
+    text-align: left;
+}
+
+.form-control {
+    padding: 8px 12px;
+    border: 1px solid #cbd5e0;
+    border-radius: 4px;
+    font-size: 14px;
+    background-color: white;
+    color: #4a5568;
+    width: 100%;
+    max-width: 350px;
+}
+
+.form-control:focus {
+    outline: none;
+    border-color: #4299e1;
+    box-shadow: 0 0 0 3px rgba(66, 153, 225, 0.1);
+}
+
+/* Estilos para SELECT */
+select.form-control {
+    cursor: pointer;
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%234a5568' d='M6 9L1 4h10z'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 10px center;
+    padding-right: 35px;
+}
+
+/* Estilos para INPUT DATE - remover ícono de calendario si es posible */
+input[type="date"].form-control {
+    position: relative;
+}
+
+input[type="date"].form-control::-webkit-calendar-picker-indicator {
+    position: absolute;
+    right: 8px;
+    cursor: pointer;
+}
+
+/* Mes de Cuota y Fecha de Pago */
+.form-group.mes-cuota,
+.form-group.fecha-pago {
+    grid-template-columns: 150px 1fr;
+}
+
+.input-group {
+    display: flex;
+    gap: 20px;
+    align-items: flex-start;
+}
+
+.input-wrapper {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    flex: 1;
+    max-width: 165px;
+}
+
+.sub-label {
+    color: #2d3748;
+    font-size: 13px;
+    font-weight: 400;
+}
+
+.input-wrapper .form-control {
+    max-width: 100%;
+}
+
+/* Botones */
+.form-buttons {
+    grid-column: 1 / -1;
+    display: flex;
+    justify-content: flex-end;
+    gap: 15px;
+    margin-top: 20px;
+}
+
+.btn {
+    padding: 12px 35px;
+    border: none;
+    border-radius: 25px;
+    font-size: 14px;
+    font-weight: bold;
+    cursor: pointer;
+    text-transform: uppercase;
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+}
+
+.btn:active {
+    transform: translateY(0);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.btn-buscar {
+    background: linear-gradient(to bottom, #ff9933, #ff9933);
+    color: white;
+}
+
+.btn-buscar:hover {
+    background: linear-gradient(to bottom, #ffaa55, #ff8822);
+}
+
+.btn-exportar {
+    background: linear-gradient(to bottom, #66cc33, #66cc33);
+    color: white;
+}
+
+.btn-exportar:hover {
+    background: linear-gradient(to bottom, #77dd44, #66cc33);
+}
+
+/* Responsive */
+@media (max-width: 1024px) {
+    .container {
+        margin-left: 0;
+        margin-top: 60px;
+    }
+}
+
+@media (max-width: 768px) {
+    .form-group {
+        grid-template-columns: 1fr;
+        gap: 8px;
+    }
+
+    .form-group label {
+        text-align: left;
+    }
+
+    .form-control {
+        max-width: 100%;
+    }
+
+    .input-wrapper {
+        max-width: 100%;
+    }
+
+    .input-group {
+        flex-direction: column;
+        gap: 15px;
+    }
+
+    .form-buttons {
+        flex-direction: column;
+    }
+
+    .btn {
+        width: 100%;
+    }
+
+    .header h1 {
+        font-size: 16px;
+    }
+
+    .filtros-container {
+        padding: 20px;
+    }
+}

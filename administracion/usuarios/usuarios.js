@@ -1,273 +1,342 @@
-/*
- * USUARIOS.JS - Gestión de Usuarios AFPnet
- */
+(function() {
+    'use strict';
 
-// ===== DATOS DE USUARIOS =====
-var DATA_BACKUP = [
-    { ruc: '12345678910', user: 'alonso',     nombres: 'Alonso',  apep: 'Lucas',     apem: 'Gomez',  perfil: 'Administrador', estado: 'ACTIVO' },
-    { ruc: '12345678910', user: 'elder',      nombres: 'Elder',   apep: 'Alejandro', apem: 'Ruiz',   perfil: 'Operador',      estado: 'ACTIVO' },
-    { ruc: '12345678910', user: 'mgarcia',    nombres: 'Maria',   apep: 'Garcia',    apem: 'Lopez',  perfil: 'Operador',      estado: 'ACTIVO' },
-    { ruc: '12345678910', user: 'jquispe',    nombres: 'Juan',    apep: 'Quispe',    apem: 'Mamani', perfil: 'Administrador', estado: 'ACTIVO' },
-    { ruc: '20987654321', user: 'gustavo',    nombres: 'Gustavo', apep: 'Adolfo',    apem: 'Perez',  perfil: 'Administrador', estado: 'ACTIVO' },
-    { ruc: '12345678910', user: 'lrodriguez', nombres: 'Lucia',   apep: 'Rodriguez', apem: 'Soto',   perfil: 'Operador',      estado: 'ACTIVO' },
-    { ruc: '20987654321', user: 'cflores',    nombres: 'Carlos',  apep: 'Flores',    apem: 'Rojas',  perfil: 'Operador',      estado: 'ACTIVO' }
-];
+    // ===== VARIABLES GLOBALES =====
+    let usuariosDB = [];
+    let usuariosFiltrados = [];
+    const rucActual = sessionStorage.getItem('afpnet_ruc');
 
-// ===== INICIALIZACIÓN =====
-document.addEventListener('DOMContentLoaded', function() {
-    loadSessionData();
-    ensureDb();
-    renderUsers();
-    bindEvents();
-});
+    // ===== ELEMENTOS =====
+    const btnBuscar = document.getElementById('btn-buscar');
+    const btnAgregar = document.getElementById('btn-agregar');
+    const btnGuia = document.getElementById('btn-guia');
+    const btnDesactivar = document.getElementById('btn-desactivar');
+    const btnSaveUser = document.getElementById('btn-save-user');
+    const tableBody = document.getElementById('user-table-body');
 
-// ===== CARGAR DATOS DE SESIÓN =====
-function loadSessionData() {
-    var nom = sessionStorage.getItem('afpnet_nombre') || 'Usuario';
-    var user = sessionStorage.getItem('afpnet_usuario') || 'Usuario';
+    // Inputs de búsqueda
+    const searchUser = document.getElementById('search-user');
+    const searchApep = document.getElementById('search-apep');
+    const searchApem = document.getElementById('search-apem');
 
-    var wName = document.getElementById('w-name');
-    var uName = document.getElementById('u-name');
-    var uInit = document.getElementById('u-init');
-
-    if (wName) wName.textContent = nom;
-    if (uName) uName.textContent = user;
-    if (uInit) uInit.textContent = user.charAt(0).toUpperCase();
-}
-
-// ===== INICIALIZAR BASE DE DATOS =====
-function ensureDb() {
-    var raw = localStorage.getItem('afpnet_db_usuarios');
-    if (!raw) {
-        localStorage.setItem('afpnet_db_usuarios', JSON.stringify(DATA_BACKUP));
-    }
-}
-
-function getDbUsers() {
-    var raw = localStorage.getItem('afpnet_db_usuarios');
-    if (!raw) return DATA_BACKUP;
-    try {
-        return JSON.parse(raw);
-    } catch (e) {
-        return DATA_BACKUP;
-    }
-}
-
-function setDbUsers(list) {
-    localStorage.setItem('afpnet_db_usuarios', JSON.stringify(list));
-}
-
-// ===== VINCULAR EVENTOS =====
-function bindEvents() {
-    var btnBuscar = document.getElementById('btn-buscar');
-    var btnGuia = document.getElementById('btn-guia');
-    var btnAgregar = document.getElementById('btn-agregar');
-    var btnDesactivar = document.getElementById('btn-desactivar');
-    var btnSaveUser = document.getElementById('btn-save-user');
-
-    // Botón BUSCAR
-    if (btnBuscar) {
-        btnBuscar.onclick = function() {
-            var user = document.getElementById('search-user');
-            var apep = document.getElementById('search-apep');
-            var apem = document.getElementById('search-apem');
-
-            renderUsers({
-                user: user ? user.value : '',
-                apep: apep ? apep.value : '',
-                apem: apem ? apem.value : ''
-            });
-        };
+    // ===== INICIALIZACIÓN =====
+    function init() {
+        cargarUsuarios();
+        mostrarUsuarios(usuariosDB);
+        setupEventListeners();
     }
 
-    // Botón GUIA DE USO
-    if (btnGuia) {
-        btnGuia.onclick = function() {
-            openM('mo-guia');
-        };
-    }
-
-    // Botón AGREGAR
-    if (btnAgregar) {
-        btnAgregar.onclick = function() {
-            openM('mo-user');
-        };
-    }
-
-    // Botón DESACTIVAR (placeholder)
-    if (btnDesactivar) {
-        btnDesactivar.onclick = function() {
-            alert('Funcionalidad DESACTIVAR: Seleccione un usuario de la tabla primero.');
-        };
-    }
-
-    // Botón GUARDAR USUARIO
-    if (btnSaveUser) {
-        btnSaveUser.onclick = guardarUsuario;
-    }
-
-    // Enter en inputs dispara búsqueda
-    var inputs = ['search-user', 'search-apep', 'search-apem'];
-    for (var i = 0; i < inputs.length; i++) {
-        var el = document.getElementById(inputs[i]);
-        if (el) {
-            el.onkeydown = function(e) {
-                if (e.key === 'Enter') {
-                    e.preventDefault();
-                    var btn = document.getElementById('btn-buscar');
-                    if (btn) btn.click();
-                }
-            };
+    // ===== CARGAR USUARIOS DE LOCALSTORAGE =====
+    function cargarUsuarios() {
+        const dbString = localStorage.getItem('afpnet_db_usuarios');
+        
+        if (dbString) {
+            const todosUsuarios = JSON.parse(dbString);
+            // Filtrar solo usuarios del RUC actual
+            usuariosDB = todosUsuarios.filter(u => u.ruc === rucActual);
+        } else {
+            usuariosDB = [];
         }
-    }
-}
-
-// ===== RENDERIZAR USUARIOS =====
-function renderUsers(filters) {
-    var tbody = document.getElementById('user-table-body');
-    if (!tbody) return;
-
-    var currentRuc = sessionStorage.getItem('afpnet_ruc') || '12345678910';
-    var lista = getDbUsers();
-
-    tbody.innerHTML = '';
-
-    var f = filters || { user: '', apep: '', apem: '' };
-    var fUser = (f.user || '').toLowerCase().trim();
-    var fApep = (f.apep || '').toLowerCase().trim();
-    var fApem = (f.apem || '').toLowerCase().trim();
-
-    var filtrados = [];
-
-    for (var i = 0; i < lista.length; i++) {
-        var u = lista[i];
-
-        // Filtrar por RUC
-        if (String(u.ruc) !== String(currentRuc)) continue;
-
-        // Filtrar por usuario
-        if (fUser !== '' && (u.user || '').toLowerCase().indexOf(fUser) === -1) continue;
-
-        // Filtrar por apellido paterno
-        if (fApep !== '' && (u.apep || '').toLowerCase().indexOf(fApep) === -1) continue;
-
-        // Filtrar por apellido materno
-        if (fApem !== '' && (u.apem || '').toLowerCase().indexOf(fApem) === -1) continue;
-
-        filtrados.push(u);
+        
+        usuariosFiltrados = [...usuariosDB];
     }
 
-    if (filtrados.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;padding:30px;color:#999;">No se encontraron usuarios.</td></tr>';
-        return;
-    }
+    // ===== MOSTRAR USUARIOS EN TABLA =====
+    function mostrarUsuarios(usuarios) {
+        if (!tableBody) return;
 
-    for (var j = 0; j < filtrados.length; j++) {
-        var usr = filtrados[j];
-        var tr = document.createElement('tr');
+        tableBody.innerHTML = '';
 
-        var nombreCompleto = (usr.nombres || '') + ' ' + (usr.apep || '') + ' ' + (usr.apem || '');
-        var badgePerfil = usr.perfil === 'Administrador' ? 'badge-admin' : 'badge-user';
-        var badgeEstado = usr.estado === 'ACTIVO' ? 'badge-pres' : 'badge-off';
-
-        tr.innerHTML =
-            '<td><strong>' + esc(usr.user) + '</strong></td>' +
-            '<td>' + esc(nombreCompleto.trim()) + '</td>' +
-            '<td>' + esc(usr.ruc) + '</td>' +
-            '<td><span class="badge ' + badgePerfil + '">' + esc(usr.perfil) + '</span></td>' +
-            '<td><span class="badge ' + badgeEstado + '">' + esc(usr.estado) + '</span></td>' +
-            '<td style="display:flex; gap:6px;">' +
-                '<button class="btn btn-blue btn-mini" title="Editar"><i class="fas fa-edit"></i></button>' +
-                '<button class="btn btn-gray btn-mini" title="Activar/Desactivar" onclick="toggleEstado(\'' + esc(usr.user) + '\', \'' + esc(usr.ruc) + '\')"><i class="fas ' + (usr.estado === 'ACTIVO' ? 'fa-user-slash' : 'fa-user-check') + '"></i></button>' +
-            '</td>';
-
-        tbody.appendChild(tr);
-    }
-}
-
-// ===== GUARDAR NUEVO USUARIO =====
-function guardarUsuario() {
-    var ruc = sessionStorage.getItem('afpnet_ruc') || '12345678910';
-    var userEl = document.getElementById('in-user');
-    var nameEl = document.getElementById('in-name');
-    var perEl = document.getElementById('in-per');
-
-    var user = userEl ? userEl.value.trim() : '';
-    var nombreCompleto = nameEl ? nameEl.value.trim() : '';
-    var perfil = perEl ? perEl.value : 'Operador';
-
-    if (!user || !nombreCompleto) {
-        alert('Complete Usuario y Nombre Completo.');
-        return;
-    }
-
-    // Separar nombre en partes
-    var parts = nombreCompleto.split(/\s+/);
-    var nombres = parts.length > 2 ? parts.slice(0, parts.length - 2).join(' ') : parts[0] || '';
-    var apep = parts.length >= 2 ? parts[parts.length - 2] : '';
-    var apem = parts.length >= 3 ? parts[parts.length - 1] : '';
-
-    var db = getDbUsers();
-
-    // Verificar si ya existe
-    for (var i = 0; i < db.length; i++) {
-        if (db[i].ruc === ruc && db[i].user.toLowerCase() === user.toLowerCase()) {
-            alert('Ese usuario ya existe para este RUC.');
+        if (usuarios.length === 0) {
+            tableBody.innerHTML = `
+                <tr>
+                    <td colspan="6" style="text-align: center; padding: 40px; color: #999;">
+                        <i class="fas fa-inbox" style="font-size: 48px; display: block; margin-bottom: 12px; opacity: 0.3;"></i>
+                        No se encontraron usuarios
+                    </td>
+                </tr>
+            `;
             return;
         }
+
+        usuarios.forEach(usuario => {
+            const tr = document.createElement('tr');
+            
+            // Extraer apellidos del nombre completo
+            const nombreParts = usuario.nombre.split(' ');
+            const apPaterno = nombreParts[0] || '';
+            const apMaterno = nombreParts[1] || '';
+            
+            // Badge de perfil
+            let badgeClass = 'badge-user';
+            if (usuario.perfil === 'Administrador') badgeClass = 'badge-admin';
+            else if (usuario.perfil === 'Operador') badgeClass = 'badge-user';
+
+            // Estado (por defecto activo)
+            const estado = usuario.estado || 'Activo';
+            const badgeEstado = estado === 'Activo' ? 'badge-pres' : 'badge-off';
+
+            tr.innerHTML = `
+                <td><strong>${usuario.user}</strong></td>
+                <td>${usuario.nombre}</td>
+                <td>${usuario.ruc}</td>
+                <td><span class="badge ${badgeClass}">${usuario.perfil}</span></td>
+                <td><span class="badge ${badgeEstado}">${estado}</span></td>
+                <td>
+                    <button class="btn btn-mini btn-blue" onclick="editarUsuario('${usuario.user}')">
+                        <i class="fas fa-edit"></i> Editar
+                    </button>
+                    ${estado === 'Activo' ? 
+                        `<button class="btn btn-mini btn-pink" onclick="desactivarUsuario('${usuario.user}')">
+                            <i class="fas fa-ban"></i> Desactivar
+                        </button>` : 
+                        `<button class="btn btn-mini btn-green" onclick="activarUsuario('${usuario.user}')">
+                            <i class="fas fa-check"></i> Activar
+                        </button>`
+                    }
+                </td>
+            `;
+
+            tableBody.appendChild(tr);
+        });
     }
 
-    db.push({
-        ruc: ruc,
-        user: user,
-        nombres: nombres,
-        apep: apep,
-        apem: apem,
-        perfil: perfil,
-        estado: 'ACTIVO'
-    });
+    // ===== EVENT LISTENERS =====
+    function setupEventListeners() {
+        if (btnBuscar) {
+            btnBuscar.addEventListener('click', buscarUsuarios);
+        }
 
-    setDbUsers(db);
+        if (btnAgregar) {
+            btnAgregar.addEventListener('click', () => {
+                window.location.href = './nuevo-usuario.php';
+            });
+        }
 
-    // Limpiar campos
-    if (userEl) userEl.value = '';
-    if (nameEl) nameEl.value = '';
+        if (btnGuia) {
+            btnGuia.addEventListener('click', () => openM('mo-guia'));
+        }
 
-    closeM('mo-user');
-    renderUsers();
-    alert('Usuario registrado correctamente.');
-}
+        if (btnDesactivar) {
+            btnDesactivar.addEventListener('click', desactivarSeleccionados);
+        }
 
-// ===== TOGGLE ESTADO =====
-function toggleEstado(user, ruc) {
-    var db = getDbUsers();
-    for (var i = 0; i < db.length; i++) {
-        if (db[i].ruc === ruc && db[i].user === user) {
-            db[i].estado = db[i].estado === 'ACTIVO' ? 'INACTIVO' : 'ACTIVO';
-            break;
+        if (btnSaveUser) {
+            btnSaveUser.addEventListener('click', guardarNuevoUsuario);
+        }
+
+        // Enter para buscar
+        [searchUser, searchApep, searchApem].forEach(input => {
+            if (input) {
+                input.addEventListener('keypress', (e) => {
+                    if (e.key === 'Enter') buscarUsuarios();
+                });
+            }
+        });
+    }
+
+    // ===== BUSCAR USUARIOS =====
+    function buscarUsuarios() {
+        const user = searchUser?.value.toLowerCase().trim() || '';
+        const apep = searchApep?.value.toLowerCase().trim() || '';
+        const apem = searchApem?.value.toLowerCase().trim() || '';
+
+        usuariosFiltrados = usuariosDB.filter(u => {
+            const nombreParts = u.nombre.toLowerCase().split(' ');
+            const matchUser = !user || u.user.toLowerCase().includes(user);
+            const matchApep = !apep || nombreParts[0]?.includes(apep);
+            const matchApem = !apem || nombreParts[1]?.includes(apem);
+
+            return matchUser && matchApep && matchApem;
+        });
+
+        mostrarUsuarios(usuariosFiltrados);
+
+        if (usuariosFiltrados.length > 0) {
+            mostrarMensaje(`Se encontraron ${usuariosFiltrados.length} usuario(s)`, 'info');
+        } else {
+            mostrarMensaje('No se encontraron usuarios con los criterios especificados', 'warning');
         }
     }
-    setDbUsers(db);
-    renderUsers();
-}
 
-// ===== HELPERS =====
-function esc(s) {
-    if (s === null || s === undefined) return '';
-    return String(s)
-        .replace(/&/g, '&amp;')
-        .replace(/</g, '&lt;')
-        .replace(/>/g, '&gt;')
-        .replace(/"/g, '&quot;')
-        .replace(/'/g, '&#039;');
-}
+    // ===== GUARDAR NUEVO USUARIO =====
+    function guardarNuevoUsuario() {
+        const inUser = document.getElementById('in-user');
+        const inName = document.getElementById('in-name');
+        const inPer = document.getElementById('in-per');
 
-function openM(id) {
-    var el = document.getElementById(id);
-    if (el) el.classList.add('vis');
-}
+        const user = inUser?.value.trim() || '';
+        const name = inName?.value.trim() || '';
+        const perfil = inPer?.value || 'Operador';
 
-function closeM(id) {
-    var el = document.getElementById(id);
-    if (el) el.classList.remove('vis');
-}
+        // Validaciones
+        if (!user || !name) {
+            mostrarMensaje('Complete todos los campos', 'error');
+            return;
+        }
+
+        if (user.length < 4) {
+            mostrarMensaje('El usuario debe tener al menos 4 caracteres', 'error');
+            return;
+        }
+
+        // Verificar si el usuario ya existe
+        const existe = usuariosDB.find(u => u.user.toLowerCase() === user.toLowerCase());
+        if (existe) {
+            mostrarMensaje('El usuario ya existe', 'error');
+            return;
+        }
+
+        // Crear nuevo usuario
+        const nuevoUsuario = {
+            ruc: rucActual,
+            user: user,
+            pass: '123456', // Contraseña por defecto
+            nombre: name,
+            perfil: perfil,
+            estado: 'Activo'
+        };
+
+        // Agregar a la BD local
+        usuariosDB.push(nuevoUsuario);
+
+        // Actualizar localStorage con TODOS los usuarios
+        const todosUsuarios = JSON.parse(localStorage.getItem('afpnet_db_usuarios') || '[]');
+        todosUsuarios.push(nuevoUsuario);
+        localStorage.setItem('afpnet_db_usuarios', JSON.stringify(todosUsuarios));
+
+        // Actualizar vista
+        usuariosFiltrados = [...usuariosDB];
+        mostrarUsuarios(usuariosFiltrados);
+
+        // Limpiar formulario y cerrar modal
+        if (inUser) inUser.value = '';
+        if (inName) inName.value = '';
+        closeM('mo-user');
+
+        mostrarMensaje('Usuario creado correctamente. Contraseña por defecto: 123456', 'success');
+    }
+
+    // ===== DESACTIVAR USUARIOS SELECCIONADOS =====
+    function desactivarSeleccionados() {
+        // Por ahora solo mostrar mensaje
+        mostrarMensaje('Seleccione usuarios en la tabla para desactivar', 'info');
+    }
+
+    // ===== FUNCIONES GLOBALES PARA ONCLICK =====
+    window.editarUsuario = function(username) {
+        mostrarMensaje(`Función de edición para usuario: ${username}`, 'info');
+    };
+
+    window.desactivarUsuario = function(username) {
+        if (!confirm(`¿Está seguro de desactivar al usuario ${username}?`)) return;
+
+        // Buscar y actualizar estado
+        const usuario = usuariosDB.find(u => u.user === username);
+        if (usuario) {
+            usuario.estado = 'Inactivo';
+
+            // Actualizar en localStorage
+            const todosUsuarios = JSON.parse(localStorage.getItem('afpnet_db_usuarios') || '[]');
+            const idx = todosUsuarios.findIndex(u => u.user === username && u.ruc === rucActual);
+            if (idx !== -1) {
+                todosUsuarios[idx].estado = 'Inactivo';
+                localStorage.setItem('afpnet_db_usuarios', JSON.stringify(todosUsuarios));
+            }
+
+            mostrarUsuarios(usuariosFiltrados);
+            mostrarMensaje(`Usuario ${username} desactivado`, 'success');
+        }
+    };
+
+    window.activarUsuario = function(username) {
+        // Buscar y actualizar estado
+        const usuario = usuariosDB.find(u => u.user === username);
+        if (usuario) {
+            usuario.estado = 'Activo';
+
+            // Actualizar en localStorage
+            const todosUsuarios = JSON.parse(localStorage.getItem('afpnet_db_usuarios') || '[]');
+            const idx = todosUsuarios.findIndex(u => u.user === username && u.ruc === rucActual);
+            if (idx !== -1) {
+                todosUsuarios[idx].estado = 'Activo';
+                localStorage.setItem('afpnet_db_usuarios', JSON.stringify(todosUsuarios));
+            }
+
+            mostrarUsuarios(usuariosFiltrados);
+            mostrarMensaje(`Usuario ${username} activado`, 'success');
+        }
+    };
+
+    // ===== CONTROL DE MODALES =====
+    window.openM = function(id) {
+        const modal = document.getElementById(id);
+        if (modal) modal.classList.add('vis');
+    };
+
+    window.closeM = function(id) {
+        const modal = document.getElementById(id);
+        if (modal) modal.classList.remove('vis');
+    };
+
+    // ===== MENSAJES TOAST =====
+    function mostrarMensaje(texto, tipo) {
+        const anterior = document.querySelector('.toast-mensaje');
+        if (anterior) anterior.remove();
+
+        const colores = {
+            success: { bg: '#d4edda', border: '#c3e6cb', color: '#155724', icon: '✓' },
+            error: { bg: '#f8d7da', border: '#f5c6cb', color: '#721c24', icon: '✕' },
+            warning: { bg: '#fff3cd', border: '#ffeeba', color: '#856404', icon: '⚠' },
+            info: { bg: '#d1ecf1', border: '#bee5eb', color: '#0c5460', icon: 'ℹ' }
+        };
+
+        const config = colores[tipo] || colores.info;
+
+        const toast = document.createElement('div');
+        toast.className = 'toast-mensaje';
+        toast.innerHTML = `<span style="font-size:16px;margin-right:8px;">${config.icon}</span> ${texto}`;
+        toast.style.cssText = `
+            position: fixed;
+            top: 70px;
+            right: 20px;
+            padding: 14px 20px;
+            background: ${config.bg};
+            border: 1px solid ${config.border};
+            color: ${config.color};
+            border-radius: 6px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            z-index: 9999;
+            display: flex;
+            align-items: center;
+            font-size: 14px;
+            animation: slideIn 0.3s ease;
+            max-width: 400px;
+        `;
+
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes slideIn {
+                from { transform: translateX(100%); opacity: 0; }
+                to { transform: translateX(0); opacity: 1; }
+            }
+        `;
+        document.head.appendChild(style);
+        document.body.appendChild(toast);
+
+        setTimeout(() => {
+            toast.style.opacity = '0';
+            toast.style.transform = 'translateX(100%)';
+            toast.style.transition = 'all 0.3s ease';
+            setTimeout(() => toast.remove(), 300);
+        }, 4000);
+    }
+
+    // ===== INIT =====
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', init);
+    } else {
+        init();
+    }
+
+})();

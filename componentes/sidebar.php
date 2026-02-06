@@ -5,7 +5,7 @@
         top: 54px;
         left: 0;
         bottom: 0;
-        width: 220px;
+        width: 240px;
         background: #f5f7fa;
         border-right: 1px solid #dce1e8;
         overflow-y: auto;
@@ -95,9 +95,7 @@
     }
 
     /* ===== CERRAR SESIÓN ===== */
-    .nav-link-danger {
-        color: #c0392b !important;
-    }
+    
     .nav-link-danger:hover {
         background: #fdf0ef !important;
         color: #a93226 !important;
@@ -150,7 +148,7 @@
                 <i class="fas fa-caret-down arrow"></i>
             </div>
             <div class="submenu">
-                <a href="#">Datos de la Empresa</a>
+                <a href="/AFP/administracion/datos_de_la_empresa/datos_de_la_empresa.php">Datos de la Empresa</a>
                 <a href="/AFP/administracion/usuarios/usuarios.php">Usuarios</a>
             </div>
         </div>
@@ -163,9 +161,9 @@
             </div>
             <div class="submenu">
                 <a href="/AFP/aportes/presentacion_y_pago_de_planillas/presentacion_y_pago_de_planillas.php">Presentación y Pago de Planillas</a>
-                <a href="#">Consulta y Pago de Planillas</a>
+                <a href="/AFP/aportes/consulta_y_pago_de_planillas/consulta_y_pago_de_planillas.php">Consulta y Pago de Planillas</a>
                 <a href="#">Consulta y Pago de Regularizaciones</a>
-                <a href="#">Pagos Pendientes de 2da Firma</a>
+                <a href="/AFP/aportes/pagos_pendientes_de_2da_firma/pagos_pendientes_de_2da_firma.php">Pagos Pendientes de 2da Firma</a>
             </div>
         </div>
 
@@ -191,8 +189,8 @@
                 <i class="fas fa-caret-down arrow"></i>
             </div>
             <div class="submenu">
-                <a href="#">Consultas</a>
-                <a href="#">Reportes</a>
+                <a href="/AFP/modulo_repro/consultas_de_cuotas/consultas_de_cuotas.php">Consultas de Cuotas</a>
+                <a href="#">Consulta de convenios REPRO</a>
             </div>
         </div>
 
@@ -203,8 +201,9 @@
                 <i class="fas fa-caret-down arrow"></i>
             </div>
             <div class="submenu">
-                <a href="#">Ver Obligaciones</a>
-                <a href="#">Historial de Pagos</a>
+                <a href="/AFP/obligaciones_de_pago/por_afiliados/por_afiliados.php">Por Afiliados</a>
+                <a href="/AFP/obligaciones_de_pago/por_devengue/por_devengue.php">Por Devengue</a>
+                <a href="/AFP/obligaciones_de_pago/planilla_movimiento_laboral/planilla_movimiento_laboral.php">Planilla Movimiento laboral</a>
             </div>
         </div>
 

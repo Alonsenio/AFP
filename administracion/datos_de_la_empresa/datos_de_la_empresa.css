@@ -1,0 +1,427 @@
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: linear-gradient(180deg, #f5f7fa 0%, #f5f7fa 50%, #f5f7fa 100%);
+    min-height: 100vh;
+}
+
+/* ===== VARIABLES ===== */
+:root {
+    --sidebar-width: 220px;
+    --topbar-height: 54px;
+    --label-width: 160px;
+    --input-bg: #ffffff;
+    --input-readonly-bg: #f3efef;
+    --text-white: #ffffff;
+    --text-dark: #1a3a5c;
+    --text-label: #3a5070;
+    --title-blue: #2c5282;
+}
+
+/* ===== MAIN ===== */
+.main {
+    margin-left: var(--sidebar-width);
+    margin-top: var(--topbar-height);
+    min-height: calc(100vh - var(--topbar-height));
+    transition: margin-left 0.3s ease;
+}
+
+.main.expanded {
+    margin-left: 0;
+}
+
+/* ===== BANNER ===== */
+.page-banner {
+    background: linear-gradient(180deg, #1c3997 0%, #1c3997 100%);
+    color: var(--text-white);
+    font-size: 16px;
+    font-weight: 600;
+    padding: 12px 24px;
+   
+    letter-spacing: 0.3px;
+}
+
+/* ===== CONTENT ===== */
+.content {
+    padding: 20px 30px;
+    max-width: 1000px;
+}
+
+/* ===== FORM SECTIONS ===== */
+.form-section {
+    margin-bottom: 8px;
+}
+
+.section-title {
+    color: var(--title-blue);
+    font-size: 15px;
+    font-weight: 600;
+    margin: 20px 0 12px 0;
+    padding: 0;
+}
+
+/* ===== FORM ROWS ===== */
+.form-row {
+    display: flex;
+    align-items: flex-start;
+    margin-bottom: 8px;
+    gap: 20px;
+}
+
+.form-row.double {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 30px;
+}
+
+.form-row.triple {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 20px;
+}
+
+/* ===== FORM FIELDS ===== */
+.form-field {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.form-field.full {
+    flex: 1;
+}
+
+.form-field label {
+    color: var(--text-label);
+    font-size: 13px;
+    font-weight: 400;
+    min-width: var(--label-width);
+    text-align: left;
+    flex-shrink: 0;
+}
+
+/* ===== INPUTS ===== */
+input[type="text"],
+input[type="email"],
+input[type="tel"],
+select {
+    padding: 8px 12px;
+    font-size: 13px;
+    color: var(--text-dark);
+    background: var(--input-bg);
+    border: 1px solid var(--border-color);
+    border-radius: 3px;
+    outline: none;
+    transition: all 0.2s;
+}
+
+input[type="text"]:focus,
+input[type="email"]:focus,
+select:focus {
+    background: #fff;
+    border-color: #64b5f6;
+    box-shadow: 0 0 0 2px rgba(100, 181, 246, 0.2);
+}
+
+input[type="text"] {
+    min-width: 200px;
+}
+
+input.input-small {
+    min-width: 120px;
+    width: 120px;
+}
+
+input.input-wide {
+    flex: 1;
+    min-width: 300px;
+}
+
+.input-readonly,
+input[readonly] {
+    background: var(--input-readonly-bg);
+    color: #5a7a94;
+    cursor: default;
+}
+
+select {
+    cursor: pointer;
+    min-width: 120px;
+}
+
+/* ===== INPUT COMBO (Select + Input) ===== */
+.input-combo {
+    display: flex;
+    gap: 0;
+}
+
+.input-combo select {
+    border-radius: 3px 0 0 3px;
+    border-right: none;
+    min-width: 100px;
+}
+
+.input-combo input {
+    border-radius: 0 3px 3px 0;
+    min-width: 150px;
+}
+
+.input-combo.wide input {
+    flex: 1;
+    min-width: 300px;
+}
+
+/* ===== UBIGEO ===== */
+.ubigeo-row,
+.ubigeo-row-2 {
+    margin-bottom: 8px;
+}
+
+.ubigeo-row .form-field,
+.ubigeo-row-2 .form-field {
+    align-items: flex-start;
+}
+
+.ubigeo-selects {
+    display: flex;
+    gap: 15px;
+}
+
+.ubigeo-item {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.ubigeo-label {
+    font-size: 11px;
+    color: var(--text-label);
+    background: #f0f7fc;
+    padding: 2px 8px;
+    border: 1px solid var(--border-color);
+    border-bottom: none;
+    border-radius: 3px 3px 0 0;
+    display: inline-block;
+}
+
+.ubigeo-item select {
+    border-radius: 0 0 3px 3px;
+    min-width: 140px;
+}
+
+/* ===== DOBLE FIRMA ===== */
+.doble-firma {
+    margin-top: 20px;
+    padding: 15px 0;
+    border-top: 1px solid var(--border-color);
+}
+
+.doble-firma-content {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+}
+
+.checkbox-label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 13px;
+    color: var(--text-label);
+    cursor: pointer;
+}
+
+.checkbox-label input[type="checkbox"] {
+    width: 16px;
+    height: 16px;
+    cursor: pointer;
+}
+
+.btn-activacion {
+    background: linear-gradient(180deg, #ff9800 0%, #f57c00 100%);
+    color: #fff;
+    border: none;
+    padding: 10px 28px;
+    font-size: 13px;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+    border-radius: 25px;
+    cursor: pointer;
+    transition: all 0.2s;
+    box-shadow: 0 2px 6px rgba(245, 124, 0, 0.3);
+}
+
+.btn-activacion:hover {
+    background: linear-gradient(180deg, #f57c00 0%, #ef6c00 100%);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 10px rgba(245, 124, 0, 0.4);
+}
+
+/* ===== MENSAJES ===== */
+.form-messages {
+    margin: 25px 0 20px 0;
+    padding-left: 5px;
+}
+
+.msg-warning {
+    color: #e65100;
+    font-size: 13px;
+    margin-bottom: 5px;
+}
+
+.msg-info {
+    color: #1976d2;
+    font-size: 13px;
+}
+
+/* ===== BOTONES ===== */
+.form-buttons {
+    display: flex;
+    justify-content: flex-end;
+    gap: 12px;
+    padding: 20px 0;
+}
+
+.btn-guardar,
+.btn-cancelar {
+    padding: 12px 45px;
+    font-size: 14px;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.btn-guardar {
+    background: linear-gradient(180deg, #0e1c9d 0%, #0e1c9d 100%);
+    color: #fff;
+    box-shadow: 0 2px 8px rgba(41, 182, 246, 0.3);
+}
+
+.btn-guardar:hover {
+    background: linear-gradient(180deg, #29b6f6 0%, #03a9f4 100%);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(41, 182, 246, 0.4);
+}
+
+.btn-cancelar {
+    background: linear-gradient(180deg, #c1bfbf 0%, #b2b5b6 100%);
+    color: #fff;
+    box-shadow: 0 2px 8px rgba(120, 144, 156, 0.3);
+}
+
+.btn-cancelar:hover {
+    background: linear-gradient(180deg, #78909c 0%, #607d8b 100%);
+    transform: translateY(-1px);
+}
+
+/* ===== RESPONSIVE ===== */
+@media (max-width: 992px) {
+    .form-row.double {
+        grid-template-columns: 1fr;
+        gap: 10px;
+    }
+
+    .form-row.triple {
+        grid-template-columns: 1fr 1fr;
+    }
+
+    .ubigeo-selects {
+        flex-wrap: wrap;
+    }
+}
+
+@media (max-width: 768px) {
+    .main {
+        margin-left: 0;
+    }
+
+    .content {
+        padding: 15px;
+    }
+
+    .page-banner {
+        font-size: 14px;
+        padding: 10px 15px;
+    }
+
+    .form-field {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 5px;
+    }
+
+    .form-field label {
+        min-width: auto;
+    }
+
+    input[type="text"],
+    input[type="email"],
+    select {
+        width: 100%;
+        min-width: auto;
+    }
+
+    .input-combo {
+        width: 100%;
+    }
+
+    .input-combo input,
+    .input-combo.wide input {
+        flex: 1;
+        min-width: auto;
+    }
+
+    .form-row.triple {
+        grid-template-columns: 1fr;
+    }
+
+    .ubigeo-selects {
+        flex-direction: column;
+        gap: 10px;
+    }
+
+    .ubigeo-item select {
+        width: 100%;
+    }
+
+    .doble-firma-content {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .form-buttons {
+        flex-direction: column;
+    }
+
+    .btn-guardar,
+    .btn-cancelar {
+        width: 100%;
+        text-align: center;
+    }
+}
+
+@media (max-width: 480px) {
+    .content {
+        padding: 10px;
+    }
+
+    .section-title {
+        font-size: 14px;
+    }
+
+    input[type="text"],
+    input[type="email"],
+    select {
+        font-size: 14px;
+        padding: 10px;
+    }
+}

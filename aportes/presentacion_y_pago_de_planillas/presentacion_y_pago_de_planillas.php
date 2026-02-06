@@ -1,98 +1,160 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-    <meta charset="utf-8">
+    <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AFPnet - Presentación y Pago de Planillas</title>
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
-    <link rel="stylesheet" href="./presentacion_y_pago_de_planillas.css">
+    <title>Presentación y Pago de Planillas - AFPnet</title>
+    <link rel="stylesheet" href="presentacion_y_pago_de_planillas.css">
 </head>
 <body>
+    <!-- ===== TOP BAR ===== -->
+    <?php
+        require "../../componentes/topbar.php"
+    ?>
+    
+    <!-- ===== SIDEBAR ===== -->
+    <?php
+        require "../../componentes/sidebar.php"
+    ?>
 
-<!-- TOPBAR -->
-<?php
-    require "../../componentes/topbar.php"
-?>
-<div class="sov" id="sov"></div>
-<!-- SIDEBAR -->
-<?php
-    require "../../componentes/sidebar.php"
-?>
-<!-- CONTENIDO -->
-<main class="main" id="mc">
-    <div class="page-banner"><span>APORTES &gt;</span> PRESENTACIÓN Y PAGO DE PLANILLAS</div>
-    <div class="content">
-        <div class="imp-box">
-            <h3>Importante:</h3>
-            <ul>
-                <li>Descargue el modelo para la declaración de planilla aquí y el modelo para la declaración de las semanas contributivas aquí. <a href="#">aquí</a> y el modelo para la declaración de las semanas contributivas <a href="#">aquí</a>.</li>
-                <li>Descargue el modelo para la declaración de planilla aquí y el modelo para la declaración de las semanas contributivas aquí.</li>
-            </ul>
+    <!-- ===== CONTENIDO PRINCIPAL ===== -->
+    <main class="main-content">
+        <!-- Breadcrumb -->
+        <div class="page-header">
+            <h1>APORTES > PRESENTACIÓN Y PAGO DE PLANILLAS</h1>
         </div>
 
-        <div class="fcard">
-            <div class="msg msg-err" id="m-err"><i class="fas fa-exclamation-circle"></i><span id="m-err-t"></span></div>
-            <div class="msg msg-ok" id="m-ok"><i class="fas fa-check-circle"></i><span id="m-ok-t"></span></div>
-            <div class="frow">
-                <label class="fl">Periodo de Devengue: <span class="req">*</span></label>
-                <select id="sel-per"><option value="">Seleccione</option></select>
+        <!-- Sección de Información -->
+        <section class="info-section">
+            <div class="info-box">
+                <h3>Importante:</h3>
+                <ul>
+                    <li>Descargue el modelo para la declaración de planilla <a href="#" class="link-descarga">aquí</a> y el modelo para la declaración de las semanas contributivas <a href="#" class="link-descarga">aquí</a>.</li>
+                    <li>Tenga en cuenta que solo puede trabajar la información de esta bandeja de trabajo hasta el final del día. Luego la información será borrada.</li>
+                </ul>
             </div>
-            <div class="frow">
-                <label class="fl">Planilla única: <span class="req">*</span></label>
-                <div class="fu-wrap" id="fu-w">
-                    <div class="fu-name" id="fu-n">Ningún archivo seleccionado</div>
-                    <button type="button" class="fu-btn" onclick="document.getElementById('file-input').click()">Seleccionar</button>
+        </section>
+
+        <!-- Sección de Carga de Archivo -->
+        <section id="seccion-carga" class="content-section">
+            <form id="form-carga" class="form-carga">
+                <div class="form-group">
+                    <label for="periodo">Periodo de Devengue: <span class="required">*</span></label>
+                    <select id="periodo" name="periodo" required>
+                        <option value="2025-01" selected>2025-01</option>
+                        <option value="2024-12">2024-12</option>
+                        <option value="2024-11">2024-11</option>
+                    </select>
                 </div>
-                <input type="file" id="file-input" accept=".xlsx,.xls,.csv">
+
+                <div class="form-group">
+                    <label for="planilla">Planilla única: <span class="required">*</span></label>
+                    <div class="file-upload">
+                        <input type="file" id="planilla" name="planilla" accept=".xlsx,.xls" style="display: none;">
+                        <button type="button" class="btn-seleccionar" onclick="document.getElementById('planilla').click()">Seleccionar</button>
+                        <span id="nombre-archivo" class="nombre-archivo">Planilla_Nuevo_Formato_Ejemplo.xlsx</span>
+                    </div>
+                </div>
+
+                <div class="form-group checkbox-group">
+                    <input type="checkbox" id="semana_contributiva" name="semana_contributiva">
+                    <label for="semana_contributiva">Cargar semana contributiva</label>
+                </div>
+
+                <p class="nota-obligatorio">Los campos marcados con asterisco (*) son obligatorios.</p>
+
+                <div class="form-actions">
+                    <button type="button" class="btn btn-guia">GUÍA DE USO</button>
+                    <button type="submit" class="btn btn-cargar">CARGAR</button>
+                </div>
+            </form>
+        </section>
+
+        <!-- Sección de Tabla (oculta inicialmente) -->
+        <section id="seccion-tabla" class="content-section" style="display: none;">
+            <div class="tabla-wrapper">
+                <table class="tabla-datos">
+                    <thead>
+                        <tr>
+                            <th>AFP</th>
+                            <th>Tipo Trabajador</th>
+                            <th>Rubro</th>
+                            <th>N° de Afiliados</th>
+                            <th>Fondo de pensiones</th>
+                            <th>Retenciones y Retribuciones</th>
+                            <th>Estado</th>
+                            <th>N° de Planilla</th>
+                            <th>Descargar</th>
+                            <th>Presentar</th>
+                            <th>Descartar</th>
+                            <th>Ticket</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tabla-body">
+                        <!-- Se llenará dinámicamente con JavaScript -->
+                    </tbody>
+                </table>
             </div>
-            <div class="chk-row"><input type="checkbox" id="chk-sem"><label for="chk-sem">Cargar semana contributiva</label></div>
-            <p class="req-note">Los campos marcados con asterisco (*) son obligatorios.</p>
-            <div class="btn-row">
-                <button class="btn btn-green"><i class="fas fa-book"></i> GUÍA DE USO</button>
-                <button class="btn btn-blue" id="btn-cargar"><span class="spinner"></span><i class="fas fa-upload"></i> CARGAR</button>
+            <button type="button" class="btn btn-nueva-carga" onclick="iniciarNuevaCarga()">
+                INICIAR NUEVA CARGA DE ARCHIVO
+            </button>
+        </section>
+
+        <!-- Modal de Ticket -->
+        <div id="modal-ticket" class="modal">
+            <div class="modal-contenido">
+                <h2>EMISIÓN DE TICKET</h2>
+                
+                <div class="ticket-info">
+                    <div class="info-row">
+                        <span class="label">Devengue:</span>
+                        <span class="valor" id="ticket-devengue">2025-01</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="label">RUC:</span>
+                        <span class="valor" id="ticket-ruc"></span>
+                    </div>
+                    <div class="info-row">
+                        <span class="label">Razón Social:</span>
+                        <span class="valor" id="ticket-razon"></span>
+                    </div>
+                    <div class="info-row">
+                        <span class="label">AFP:</span>
+                        <span class="valor">INTEGRA</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="label">Fecha de Pago:</span>
+                        <span class="valor" id="ticket-fecha">03/02/2025</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="label">Número de Planilla:</span>
+                        <span class="valor" id="ticket-numero"></span>
+                    </div>
+                    <div class="info-row">
+                        <span class="label">Total monto fondo de pensiones (S/.):</span>
+                        <span class="valor" id="ticket-fondo">565.00</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="label">Total retenciones y retribuciones (S/.):</span>
+                        <span class="valor" id="ticket-retenciones">77.40</span>
+                    </div>
+                </div>
+
+                <p class="nota-ticket">El pago no está afecto a intereses debido a fecha de pago oportuna.</p>
+
+                <div class="modal-actions">
+                    <button type="button" class="btn btn-regresar" onclick="cerrarModal()">REGRESAR</button>
+                    <button type="button" class="btn btn-emitir" onclick="emitirTicket()">EMITIR TICKET</button>
+                </div>
             </div>
         </div>
 
-        <div class="results" id="results">
-            <p class="results-info">Seleccione la AFP con la que desee trabajar, así como el tipo de operación.</p>
-            <div class="tbl-wrap">
-                <div class="tbl-scroll">
-                    <table>
-                        <thead><tr>
-                            <th>AFP</th><th>Tipo<br>Trabajador</th><th>Rubro</th><th>N° de<br>Afiliados</th>
-                            <th>Fondo de<br>pensiones</th><th>Retenciones y<br>Retribuciones</th>
-                            <th>Estado</th><th>N° de Planilla</th>
-                            <th>Descargar</th><th>Presentar</th><th>Descartar</th><th>Ticket</th>
-                        </tr></thead>
-                        <tbody id="res-body"></tbody>
-                    </table>
-                </div>
-                <div class="tbl-footer">
-                    <button class="btn btn-orange" onclick="nuevaCarga()"><i class="fas fa-plus-circle"></i> INICIAR NUEVA CARGA DE ARCHIVO</button>
-                </div>
-            </div>
+        <!-- Overlay de Loading -->
+        <div id="loading" class="loading-overlay" style="display: none;">
+            <div class="spinner"></div>
         </div>
-    </div>
-</main>
-<!-- MODAL: EMITIR -->
-<div class="mo" id="mo-emit">
-    <div class="modal">
-        <div class="mh mh-blue">EMISIÓN DE TICKET<button class="mx" onclick="closeM('mo-emit')"><i class="fas fa-times"></i></button></div>
-        <div class="mb"><div class="ig" id="emit-ig"></div><p style="font-size:13px;color:#555;font-weight:600">El pago no está afecto a intereses debido a fecha de pago oportuna.</p></div>
-        <div class="mf"><button class="btn btn-gray" onclick="closeM('mo-emit')">REGRESAR</button><button class="btn btn-blue" id="btn-do-emit">EMITIR TICKET</button></div>
-    </div>
-</div>
-<!-- MODAL: TICKET EMITIDO -->
-<div class="mo" id="mo-ticket">
-    <div class="modal">
-        <div class="mh mh-green">TICKET EMITIDO<button class="mx" onclick="closeM('mo-ticket')"><i class="fas fa-times"></i></button></div>
-        <div class="mb" id="ticket-mb"></div>
-        <div class="mf"><button class="btn btn-gray" onclick="closeM('mo-ticket')">REGRESAR</button><button class="btn btn-blue" id="btn-print"><i class="fas fa-print"></i> IMPRIMIR TICKET</button></div>
-    </div>
-</div>
-<script src="./presentacion_y_pago_de_planillas.js"></script>
+    </main>
+
+    <script src="presentacion_y_pago_de_planillas.js"></script>
 </body>
 </html>
