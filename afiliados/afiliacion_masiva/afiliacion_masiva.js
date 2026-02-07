@@ -1,242 +1,412 @@
-// ===== DATOS DE RESPALDO =====
-const DATA_BACKUP = [
-    { ruc: '20603401574', user: 'jcalderon', nombre: 'Jose Luis Calderon Ormeño', appat: 'Calderon', apmat: 'Ormeño', perfil: 'Administrador', estado: 'ACTIVO' },
-    { ruc: '20603401574', user: 'mgarcia',   nombre: 'Maria Garcia Lopez',       appat: 'Garcia',   apmat: 'Lopez',   perfil: 'Operador',       estado: 'ACTIVO' },
-    { ruc: '20603401574', user: 'jquispe',   nombre: 'Juan Quispe Rojas',        appat: 'Quispe',   apmat: 'Rojas',   perfil: 'Operador',       estado: 'ACTIVO' },
-    { ruc: '20603401574', user: 'cflores',   nombre: 'Carlos Flores Diaz',       appat: 'Flores',   apmat: 'Diaz',    perfil: 'Administrador',  estado: 'ACTIVO' },
-    { ruc: '20603401574', user: 'lrodriguez',nombre: 'Lucia Rodriguez Pena',     appat: 'Rodriguez', apmat: 'Pena',   perfil: 'Operador',       estado: 'INACTIVO' },
-];
+// afiliacion_masiva.js
 
 // ===== HELPERS =====
 const $ = id => document.getElementById(id);
-let editingIndex = -1;
+const userRUC    = sessionStorage.getItem('afpnet_ruc')     || '20603401574';
+const uName      = sessionStorage.getItem('afpnet_usuario') || 'Usuario';
+const razonSoc   = sessionStorage.getItem('afpnet_razon')   || 'EMPRESA S.A.C.';
+
+// Key compartida con consulta_de_solicitudes
+const BATCHES_KEY = 'afpnet_afiliacion_masiva_batches';
+
+let loadedRows = [];
 
 // ===== INIT =====
 document.addEventListener('DOMContentLoaded', () => {
-    initData();
-    bindEvents();
-    // Mostrar todos al cargar
-    onBuscar();
+  const dn = uName.charAt(0).toUpperCase() + uName.slice(1);
+  const wName = $('w-name'); if (wName) wName.textContent = dn;
+  const uNameEl = $('u-name'); if (uNameEl) uNameEl.textContent = dn;
+  const uInit = $('u-init'); if (uInit) uInit.textContent = dn.substring(0, 2).toUpperCase();
+  const tbRuc = $('tb-ruc'); if (tbRuc) tbRuc.textContent = userRUC;
+  const tbRazon = $('tb-razon'); if (tbRazon) tbRazon.textContent = razonSoc;
+
+  updClk();
+  setInterval(updClk, 1000);
+
+  $('btn-cargar')?.addEventListener('click', onCargar);
+  $('btn-guia')?.addEventListener('click', () => alert('Aqui se abrira la guia de uso.'));
+  $('btn-export')?.addEventListener('click', onExport);
+  $('btn-clear')?.addEventListener('click', onClear);
+  $('lnk-modelo')?.addEventListener('click', onDescargarModelo);
+
+  loadLastBatch();
 });
 
-function initData() {
-    const currentRuc = sessionStorage.getItem('afpnet_ruc') || '20603401574';
+// ===== RELOJ =====
+function updClk() {
+  const n = new Date();
+  const el = $('tb-time');
+  if (!el) return;
+  el.innerHTML =
+    n.toLocaleTimeString('es-PE', { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: true }) +
+    '<br>' +
+    n.toLocaleDateString('es-PE', { day: '2-digit', month: '2-digit', year: 'numeric' });
+}
 
-    let existentes = [];
-    try {
-        const raw = localStorage.getItem('afpnet_db_usuarios');
-        if (raw) existentes = JSON.parse(raw);
-    } catch(_) {}
+// ===== MENSAJES =====
+function showErr(msg) {
+  const el = $('m-err'); const t = $('m-err-t');
+  if (el && t) { t.textContent = msg; el.classList.add('vis'); }
+  hideOk();
+}
+function hideErr() { $('m-err')?.classList.remove('vis'); }
+function showOk(msg) {
+  const el = $('m-ok'); const t = $('m-ok-t');
+  if (el && t) { t.textContent = msg; el.classList.add('vis'); }
+  hideErr();
+}
+function hideOk() { $('m-ok')?.classList.remove('vis'); }
 
-    const tieneDelRuc = Array.isArray(existentes) && existentes.some(u => String(u.ruc) === String(currentRuc));
+// ===== GENERAR CODIGO DE CARGA =====
+function generarCodCarga() {
+  const now = new Date();
+  const pad = (n, l = 2) => String(n).padStart(l, '0');
+  return 'MC' +
+    now.getFullYear() +
+    pad(now.getMonth() + 1) +
+    pad(now.getDate()) +
+    pad(now.getHours()) +
+    pad(now.getMinutes()) +
+    pad(now.getSeconds());
+}
 
-    if (!tieneDelRuc) {
-        const adaptados = DATA_BACKUP.map(u => ({ ...u, ruc: currentRuc }));
-        const merged = Array.isArray(existentes) ? [...existentes, ...adaptados] : adaptados;
-        localStorage.setItem('afpnet_db_usuarios', JSON.stringify(merged));
+// ===== CARGAR ARCHIVO =====
+function onCargar() {
+  hideErr(); hideOk();
+
+  const fileInput = $('file');
+  if (!fileInput || !fileInput.files || fileInput.files.length === 0) {
+    showErr('Debe seleccionar un archivo antes de cargar.');
+    return;
+  }
+
+  const file = fileInput.files[0];
+  const name = file.name.toLowerCase();
+  const btn = $('btn-cargar');
+
+  if (btn) { btn.classList.add('loading'); btn.disabled = true; }
+
+  const reader = new FileReader();
+
+  if (name.endsWith('.txt') || name.endsWith('.csv')) {
+    reader.onload = (e) => {
+      try {
+        const text = e.target.result;
+        const rows = parseTxtCsv(text, name);
+        finalizarCarga(rows, btn);
+      } catch (err) {
+        if (btn) { btn.classList.remove('loading'); btn.disabled = false; }
+        showErr('Error al leer el archivo: ' + err.message);
+      }
+    };
+    reader.onerror = () => {
+      if (btn) { btn.classList.remove('loading'); btn.disabled = false; }
+      showErr('Error al leer el archivo.');
+    };
+    reader.readAsText(file, 'UTF-8');
+
+  } else if (name.endsWith('.xlsx') || name.endsWith('.xls')) {
+    reader.onload = (e) => {
+      try {
+        const data = new Uint8Array(e.target.result);
+        const wb = XLSX.read(data, { type: 'array' });
+        const sheetName = wb.SheetNames[0];
+        const sheet = wb.Sheets[sheetName];
+        const jsonRows = XLSX.utils.sheet_to_json(sheet, { header: 1, defval: '' });
+        const rows = parseExcelRows(jsonRows);
+        finalizarCarga(rows, btn);
+      } catch (err) {
+        if (btn) { btn.classList.remove('loading'); btn.disabled = false; }
+        showErr('Error al procesar el archivo Excel: ' + err.message);
+      }
+    };
+    reader.onerror = () => {
+      if (btn) { btn.classList.remove('loading'); btn.disabled = false; }
+      showErr('Error al leer el archivo.');
+    };
+    reader.readAsArrayBuffer(file);
+
+  } else {
+    if (btn) { btn.classList.remove('loading'); btn.disabled = false; }
+    showErr('Formato no soportado. Use .xlsx, .xls, .csv o .txt');
+  }
+}
+
+// ===== PARSEAR TXT / CSV =====
+function parseTxtCsv(text) {
+  const lines = text.split(/\r?\n/).filter(l => l.trim() !== '');
+  if (lines.length === 0) throw new Error('El archivo esta vacio.');
+  const sep = detectSeparator(lines[0]);
+  const rows = [];
+  for (const line of lines) {
+    const cols = line.split(sep).map(c => c.trim());
+    if (rows.length === 0 && isHeader(cols)) continue;
+    if (cols.length < 6) continue;
+    rows.push(mapColumns(cols));
+  }
+  return rows;
+}
+
+// ===== PARSEAR EXCEL =====
+function parseExcelRows(jsonRows) {
+  if (jsonRows.length === 0) throw new Error('El archivo esta vacio.');
+  const rows = [];
+  for (let i = 0; i < jsonRows.length; i++) {
+    const cols = jsonRows[i].map(c => String(c ?? '').trim());
+    if (i === 0 && isHeader(cols)) continue;
+    if (cols.length < 6) continue;
+    rows.push(mapColumns(cols));
+  }
+  return rows;
+}
+
+// ===== DETECTAR SEPARADOR =====
+function detectSeparator(line) {
+  const counts = {
+    '|': (line.match(/\|/g) || []).length,
+    ';': (line.match(/;/g) || []).length,
+    ',': (line.match(/,/g) || []).length,
+    '\t': (line.match(/\t/g) || []).length
+  };
+  let best = '|', max = 0;
+  for (const [sep, count] of Object.entries(counts)) {
+    if (count > max) { max = count; best = sep; }
+  }
+  return best;
+}
+
+// ===== DETECTAR SI ES ENCABEZADO =====
+function isHeader(cols) {
+  const first = (cols[0] || '').toLowerCase();
+  return (
+    first.includes('documento') || first.includes('dni') ||
+    first.includes('nro') || first.includes('numero') ||
+    first.includes('num') || first === 'n\u00b0' || first === 'n\u00ba'
+  );
+}
+
+// =====================================================
+// MAPEAR COLUMNAS — NOMBRES ESTANDARIZADOS
+// Estos nombres son los mismos que usa consulta_de_solicitudes
+// Formato: nroDoc | nombres | appat | apmat | fechaNac | email | fijo | movil | ubigeo | tipoVia | nombreVia | ... | origenONP
+// =====================================================
+function mapColumns(cols) {
+  return {
+    tipodoc:          'DNI',
+    nro_documento:    cols[0]  || '',
+    nombres:          cols[1]  || '',
+    apellido_paterno: cols[2]  || '',
+    apellido_materno: cols[3]  || '',
+    fecha_nacimiento: cols[4]  || '',
+    mail_principal:   cols[5]  || '',
+    telefono_fijo:    cols[6]  || '',
+    telefono_movil:   cols[7]  || '',
+    ubigeo:           cols[8]  || '',
+    tipo_via:         cols[9]  || '',
+    nombre_via:       cols[10] || '',
+    origen_onp:       cols[cols.length - 1] || '0'
+  };
+}
+
+// ===== FINALIZAR CARGA =====
+function finalizarCarga(rows, btn) {
+  setTimeout(() => {
+    if (btn) { btn.classList.remove('loading'); btn.disabled = false; }
+
+    if (rows.length === 0) {
+      showErr('No se encontraron registros validos en el archivo.');
+      return;
     }
+    if (rows.length > 1000) {
+      showErr('El archivo excede el maximo de 1000 registros.');
+      return;
+    }
+
+    const codCarga = generarCodCarga();
+    loadedRows = rows;
+
+    guardarBatch(codCarga, rows);
+    renderResults(codCarga, rows);
+    showOk('Se cargaron ' + rows.length + ' registro(s) correctamente. Codigo: ' + codCarga);
+  }, 600);
 }
 
-function bindEvents() {
-    $('btn-buscar')?.addEventListener('click', onBuscar);
-    $('btn-agregar')?.addEventListener('click', () => openAgregar());
-    $('btn-desactivar')?.addEventListener('click', onDesactivar);
-    $('btn-guia')?.addEventListener('click', () => alert('Aquí abrirás tu guía de uso.'));
-    $('btn-save-user')?.addEventListener('click', onGuardar);
-    $('chk-all')?.addEventListener('change', onCheckAll);
-}
+// =====================================================
+// GUARDAR EN LOCALSTORAGE — ESTRUCTURA ESTANDARIZADA
+// Cada registro incluye TODOS los campos que consulta_de_solicitudes necesita
+// =====================================================
+function guardarBatch(codCarga, rows) {
+  try {
+    let batches = [];
+    const raw = localStorage.getItem(BATCHES_KEY);
+    if (raw) batches = JSON.parse(raw);
 
-// ===== CARGAR USUARIOS =====
-function getUsuarios() {
-    try {
-        const raw = localStorage.getItem('afpnet_db_usuarios');
-        return raw ? JSON.parse(raw) : [];
-    } catch (_) { return []; }
-}
-function saveUsuarios(arr) {
-    localStorage.setItem('afpnet_db_usuarios', JSON.stringify(arr));
-}
-
-// ===== BUSCAR =====
-function onBuscar() {
-    const fUser  = ($('inp-usuario')?.value || '').trim().toLowerCase();
-    const fAppat = ($('inp-appat')?.value || '').trim().toLowerCase();
-    const fApmat = ($('inp-apmat')?.value || '').trim().toLowerCase();
-
-    const currentRuc = sessionStorage.getItem('afpnet_ruc') || '20603401574';
-    const todos = getUsuarios();
-
-    const filtered = todos.filter(u => {
-        if (String(u.ruc) !== String(currentRuc)) return false;
-
-        // Filtro por usuario
-        if (fUser && !(u.user || '').toLowerCase().includes(fUser)) return false;
-
-        // Filtro por apellido paterno (busca en appat y en nombre)
-        if (fAppat) {
-            const enAppat  = (u.appat || '').toLowerCase().includes(fAppat);
-            const enNombre = (u.nombre || '').toLowerCase().includes(fAppat);
-            if (!enAppat && !enNombre) return false;
-        }
-
-        // Filtro por apellido materno (busca en apmat y en nombre)
-        if (fApmat) {
-            const enApmat  = (u.apmat || '').toLowerCase().includes(fApmat);
-            const enNombre = (u.nombre || '').toLowerCase().includes(fApmat);
-            if (!enApmat && !enNombre) return false;
-        }
-
-        return true;
+    batches.push({
+      codigo_carga:     codCarga,
+      fecha:            new Date().toISOString(),
+      ruc:              userRUC,
+      razon_social:     razonSoc,
+      usuario_agente:   uName,
+      estado_solicitud: 'REGISTRADA',
+      estado_pre:       'SIN_PRE',
+      registros:        rows.map(function(r) {
+        return {
+          codigo_carga:     codCarga,
+          tipodoc:          r.tipodoc || 'DNI',
+          nro_documento:    r.nro_documento,
+          nombres:          r.nombres,
+          apellido_paterno: r.apellido_paterno,
+          apellido_materno: r.apellido_materno,
+          fecha_nacimiento: r.fecha_nacimiento,
+          mail_principal:   r.mail_principal,
+          telefono_fijo:    r.telefono_fijo,
+          telefono_movil:   r.telefono_movil,
+          ubigeo:           r.ubigeo,
+          tipo_via:         r.tipo_via,
+          nombre_via:       r.nombre_via,
+          origen_onp:       r.origen_onp,
+          ruc:              userRUC,
+          razon_social:     razonSoc,
+          usuario_agente:   uName,
+          estado_solicitud: 'REGISTRADA',
+          estado_pre:       'SIN_PRE'
+        };
+      })
     });
 
-    renderTable(filtered);
+    localStorage.setItem(BATCHES_KEY, JSON.stringify(batches));
+  } catch (e) {
+    console.warn('No se pudo guardar en localStorage:', e);
+  }
 }
 
-// ===== RENDER TABLA =====
-function renderTable(arr) {
-    const tbody = $('user-table-body');
-    if (!tbody) return;
-    tbody.innerHTML = '';
-
-    if (arr.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="7" style="text-align:center;padding:30px;color:#999;">No se encontraron usuarios.</td></tr>`;
-        return;
+// ===== CARGAR ULTIMO BATCH =====
+function loadLastBatch() {
+  try {
+    const raw = localStorage.getItem(BATCHES_KEY);
+    if (!raw) return;
+    const batches = JSON.parse(raw);
+    if (batches.length === 0) return;
+    const last = batches[batches.length - 1];
+    if (last.registros && last.registros.length > 0) {
+      loadedRows = last.registros;
+      renderResults(last.codigo_carga, last.registros);
     }
-
-    arr.forEach((u) => {
-        const esActivo = (u.estado || 'ACTIVO') === 'ACTIVO';
-        const tr = document.createElement('tr');
-        tr.innerHTML = `
-            <td style="text-align:center;"><input type="checkbox" class="chk-row" data-user="${esc(u.user)}"></td>
-            <td><strong>${esc(u.user)}</strong></td>
-            <td>${esc(u.nombre)}</td>
-            <td>${esc(u.ruc)}</td>
-            <td><span class="badge ${u.perfil === 'Administrador' ? 'badge-admin' : 'badge-user'}">${esc(u.perfil)}</span></td>
-            <td><span class="badge ${esActivo ? 'badge-pres' : 'badge-pend'}">${esActivo ? 'ACTIVO' : 'INACTIVO'}</span></td>
-            <td>
-                <button class="btn btn-blue btn-mini" onclick="openEditar('${esc(u.user)}')" title="Editar"><i class="fas fa-edit"></i></button>
-                <button class="btn btn-pink btn-mini" onclick="eliminarUser('${esc(u.user)}')" title="Eliminar"><i class="fas fa-trash"></i></button>
-            </td>
-        `;
-        tbody.appendChild(tr);
-    });
+  } catch (_) {}
 }
 
+// ===== RENDER RESULTADOS =====
+function renderResults(codCarga, rows) {
+  const section = $('results');
+  const tbody   = $('res-body');
+  const countEl = $('res-count');
+  const codView = $('cod-carga-view');
+
+  if (!tbody || !section) return;
+  tbody.innerHTML = '';
+
+  if (codView) codView.textContent = codCarga;
+  if (countEl) {
+    countEl.innerHTML = 'Se encontraron <strong>' + rows.length + '</strong> registro' + (rows.length !== 1 ? 's' : '') + '.';
+  }
+
+  rows.forEach(function(r) {
+    var tr = document.createElement('tr');
+    tr.innerHTML =
+      '<td style="font-weight:700;color:var(--blue)">' + esc(codCarga) + '</td>' +
+      '<td>' + esc(r.nro_documento) + '</td>' +
+      '<td>' + esc(r.nombres) + '</td>' +
+      '<td>' + esc(r.apellido_paterno) + '</td>' +
+      '<td>' + esc(r.apellido_materno) + '</td>' +
+      '<td>' + esc(r.fecha_nacimiento) + '</td>' +
+      '<td>' + esc(r.mail_principal) + '</td>' +
+      '<td>' + esc(r.telefono_fijo) + '</td>' +
+      '<td>' + esc(r.telefono_movil) + '</td>' +
+      '<td>' + esc(r.ubigeo) + '</td>' +
+      '<td>' + esc(r.tipo_via) + '</td>' +
+      '<td>' + esc(r.nombre_via) + '</td>' +
+      '<td>' + esc(userRUC) + '</td>' +
+      '<td>' + esc(razonSoc) + '</td>' +
+      '<td>' + esc(uName) + '</td>' +
+      '<td>' + esc(r.origen_onp) + '</td>';
+    tbody.appendChild(tr);
+  });
+
+  section.classList.add('vis');
+  section.scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+// ===== ESCAPE HTML =====
 function esc(s) {
-    return String(s ?? '').replace(/[&<>"']/g, m => ({
-        '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;'
-    }[m]));
+  return String(s ?? '').replace(/[&<>"']/g, function(m) {
+    return ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;' })[m];
+  });
 }
 
-// ===== CHECKBOX ALL =====
-function onCheckAll() {
-    const checked = $('chk-all')?.checked || false;
-    document.querySelectorAll('.chk-row').forEach(c => c.checked = checked);
+// ===== EXPORTAR A EXCEL =====
+function onExport() {
+  if (loadedRows.length === 0) { showErr('No hay datos para exportar.'); return; }
+
+  var headers = [
+    'Codigo Carga', 'Nro Documento', 'Nombres', 'Apellido Paterno', 'Apellido Materno',
+    'Fecha Nac.', 'Email', 'Tel. Fijo', 'Tel. Movil', 'Ubigeo',
+    'Tipo Via', 'Nombre Via', 'RUC', 'Razon Social', 'Usuario Agente', 'Origen ONP'
+  ];
+  var codCarga = $('cod-carga-view')?.textContent || '-';
+  var data = loadedRows.map(function(r) {
+    return [
+      codCarga, r.nro_documento, r.nombres, r.apellido_paterno, r.apellido_materno,
+      r.fecha_nacimiento, r.mail_principal, r.telefono_fijo, r.telefono_movil, r.ubigeo,
+      r.tipo_via, r.nombre_via, userRUC, razonSoc, uName, r.origen_onp
+    ];
+  });
+
+  var ws = XLSX.utils.aoa_to_sheet([headers].concat(data));
+  var wb = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb, ws, 'Afiliacion Masiva');
+  XLSX.writeFile(wb, 'afiliacion_masiva_' + codCarga + '.xlsx');
 }
 
-// ===== AGREGAR =====
-function openAgregar() {
-    editingIndex = -1;
-    const title = $('mo-user-title');
-    if (title) title.textContent = 'REGISTRAR NUEVO USUARIO';
-    if ($('in-user')) { $('in-user').value = ''; $('in-user').disabled = false; }
-    if ($('in-name')) $('in-name').value = '';
-    if ($('in-per')) $('in-per').value = 'Operador';
-    openM('mo-user');
+// ===== LIMPIAR GUARDADO =====
+function onClear() {
+  if (!confirm('Esta seguro de limpiar todos los lotes guardados?')) return;
+  localStorage.removeItem(BATCHES_KEY);
+  loadedRows = [];
+  var tbody = $('res-body');
+  if (tbody) tbody.innerHTML = '';
+  $('results')?.classList.remove('vis');
+  hideErr();
+  showOk('Datos limpiados correctamente.');
 }
 
-// ===== EDITAR =====
-function openEditar(userId) {
-    const todos = getUsuarios();
-    const idx = todos.findIndex(u => u.user === userId);
-    if (idx < 0) return;
-
-    editingIndex = idx;
-    const u = todos[idx];
-    const title = $('mo-user-title');
-    if (title) title.textContent = 'EDITAR USUARIO';
-    if ($('in-user')) { $('in-user').value = u.user; $('in-user').disabled = true; }
-    if ($('in-name')) $('in-name').value = u.nombre;
-    if ($('in-per')) $('in-per').value = u.perfil;
-    openM('mo-user');
+// ===== DESCARGAR MODELO =====
+function onDescargarModelo(e) {
+  e.preventDefault();
+  var headers = [
+    'Nro Documento', 'Nombres', 'Apellido Paterno', 'Apellido Materno',
+    'Fecha Nacimiento', 'Email', 'Tel. Fijo', 'Tel. Movil', 'Ubigeo',
+    'Tipo Via', 'Nombre Via', 'Origen ONP'
+  ];
+  var ejemplo = [
+    '10379368', 'Nevardo Alcides', 'Alzamora', 'Lara',
+    '04/09/1974', 'correo@mail.com', '014567890', '987654321', '150101',
+    'Jr', 'San Antonio 452', '0'
+  ];
+  var ws = XLSX.utils.aoa_to_sheet([headers, ejemplo]);
+  var wb = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb, ws, 'Modelo');
+  XLSX.writeFile(wb, 'modelo_afiliacion_masiva.xlsx');
 }
 
-// ===== GUARDAR (AGREGAR / EDITAR) =====
-function onGuardar() {
-    const user = ($('in-user')?.value || '').trim();
-    const name = ($('in-name')?.value || '').trim();
-    const perf = $('in-per')?.value || 'Operador';
-
-    if (!user) { alert('Ingrese el Usuario (ID).'); return; }
-    if (!name) { alert('Ingrese el Nombre Completo.'); return; }
-
-    const currentRuc = sessionStorage.getItem('afpnet_ruc') || '20603401574';
-    const todos = getUsuarios();
-
-    if (editingIndex >= 0) {
-        todos[editingIndex].nombre = name;
-        todos[editingIndex].perfil = perf;
-        saveUsuarios(todos);
-        closeM('mo-user');
-        alert(`Usuario "${user}" actualizado.`);
-    } else {
-        if (todos.some(u => u.user === user && String(u.ruc) === String(currentRuc))) {
-            alert('Ya existe un usuario con ese ID.');
-            return;
-        }
-        const partes = name.split(' ');
-        todos.push({
-            ruc: currentRuc,
-            user: user,
-            nombre: name,
-            appat: partes[0] || '',
-            apmat: partes[1] || '',
-            perfil: perf,
-            estado: 'ACTIVO'
-        });
-        saveUsuarios(todos);
-        closeM('mo-user');
-        alert(`Usuario "${user}" registrado.`);
-    }
-
-    onBuscar();
+// ===== SIDEBAR (compatibilidad) =====
+function togSub(el) {
+  var sub = el.nextElementSibling;
+  if (!sub) return;
+  var op = sub.classList.contains('open');
+  document.querySelectorAll('.submenu.open').forEach(function(s) {
+    if (s !== sub) { s.classList.remove('open'); s.previousElementSibling.classList.remove('open'); }
+  });
+  if (!op) { sub.classList.add('open'); el.classList.add('open'); }
+  else { sub.classList.remove('open'); el.classList.remove('open'); }
 }
-
-// ===== ELIMINAR =====
-function eliminarUser(userId) {
-    if (!confirm(`¿Eliminar al usuario "${userId}"?`)) return;
-
-    const todos = getUsuarios();
-    const idx = todos.findIndex(u => u.user === userId);
-    if (idx < 0) return;
-
-    todos.splice(idx, 1);
-    saveUsuarios(todos);
-    alert(`Usuario "${userId}" eliminado.`);
-    onBuscar();
-}
-
-// ===== DESACTIVAR SELECCIONADOS =====
-function onDesactivar() {
-    const checks = document.querySelectorAll('.chk-row:checked');
-    if (checks.length === 0) {
-        alert('Seleccione al menos un usuario para desactivar.');
-        return;
-    }
-
-    const users = Array.from(checks).map(c => c.dataset.user);
-    if (!confirm(`¿Desactivar ${users.length} usuario(s)?`)) return;
-
-    const todos = getUsuarios();
-    users.forEach(uid => {
-        const u = todos.find(x => x.user === uid);
-        if (u) u.estado = 'INACTIVO';
-    });
-    saveUsuarios(todos);
-    alert(`${users.length} usuario(s) desactivado(s).`);
-    onBuscar();
-}
-
-// ===== MODALES =====
-function openM(id) { $(id)?.classList.add('vis'); }
-function closeM(id) { $(id)?.classList.remove('vis'); }
+function cerrarSesion() { sessionStorage.clear(); location.href = '../../login/login.php'; }

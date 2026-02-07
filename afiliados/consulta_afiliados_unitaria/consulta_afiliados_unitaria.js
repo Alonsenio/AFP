@@ -34,20 +34,6 @@ function updClk(){
         '<br>' + n.toLocaleDateString('es-PE',{day:'2-digit',month:'2-digit',year:'numeric'});
 }
 
-// ===== SIDEBAR =====
-const sb=document.getElementById('sb'),mc=document.getElementById('mc'),sov=document.getElementById('sov');
-document.getElementById('btn-tog').onclick=()=>{
-    if(innerWidth<=768){sb.classList.toggle('mob');sov.classList.toggle('vis')}
-    else{sb.classList.toggle('collapsed');mc.classList.toggle('exp')}
-};
-sov.onclick=()=>{sb.classList.remove('mob');sov.classList.remove('vis')};
-function togSub(el){
-    const sub=el.nextElementSibling;if(!sub)return;
-    const op=sub.classList.contains('open');
-    document.querySelectorAll('.submenu.open').forEach(s=>{if(s!==sub){s.classList.remove('open');s.previousElementSibling.classList.remove('open')}});
-    if(!op){sub.classList.add('open');el.classList.add('open')}else{sub.classList.remove('open');el.classList.remove('open')}
-}
-function cerrarSesion(){sessionStorage.clear();location.href='../../login/login.php'}
 
 // ===== RADIO TOGGLE LOGIC =====
 function setupRadios(){

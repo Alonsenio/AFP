@@ -13,7 +13,7 @@ body {
 .main {
     margin-top: 56px;
     margin-left: 240px;
-    padding: 20px;
+    padding: 0px;
     min-height: calc(100vh - 56px);
     transition: margin-left 0.3s;
 }
@@ -27,7 +27,7 @@ body {
     background-color: #1c3997;
     color: #fff;
     padding: 14px 24px;
-    border-radius: 6px;
+   
     font-size: 15px;
     font-weight: 600;
     margin-bottom: 20px;

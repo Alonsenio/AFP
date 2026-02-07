@@ -73,19 +73,20 @@ function updClk(){
 }
 
 function wireSidebar(){
-  const sb = $('sb');
-  const mc = $('mc');
-  const sov = $('sov');
-  const btn = $('btn-tog');
-  if(btn){
-    btn.onclick = () => {
+  var sb = document.getElementById('sb');
+  var mc = document.getElementById('mc');
+  var sov = document.getElementById('sov');
+  var btnTog = document.getElementById('btn-tog') || document.querySelector('.btn-menu');
+
+  if(btnTog){
+    btnTog.onclick = function(){
       if(!sb) return;
-      if(innerWidth<=768){ sb.classList.toggle('mob'); sov?.classList.toggle('vis'); }
-      else { sb.classList.toggle('collapsed'); mc?.classList.toggle('exp'); }
+      if(innerWidth<=768){ sb.classList.toggle('mob'); if(sov) sov.classList.toggle('vis'); }
+      else { sb.classList.toggle('collapsed'); if(mc) mc.classList.toggle('exp'); }
     };
   }
   if(sov){
-    sov.onclick = () => { sb?.classList.remove('mob'); sov.classList.remove('vis'); };
+    sov.onclick = function(){ if(sb) sb.classList.remove('mob'); sov.classList.remove('vis'); };
   }
 }
 
@@ -186,27 +187,29 @@ function loadBatches(){
 
 // =====================
 // Aplanar batches → solicitudes individuales con estado por persona
+// Compatible con formato viejo (nroDoc/appat/apmat) y nuevo (nro_documento/apellido_paterno/apellido_materno)
 // =====================
 function buildSolicitudes(batches){
-  const out = [];
-  batches.forEach(batch => {
-    const codigo = batch.codigo_carga || '';
-    (batch.registros || []).forEach(r => {
+  var out = [];
+  batches.forEach(function(batch){
+    // codigo_carga: formato nuevo = batch.codigo_carga, formato viejo = batch.codigo
+    var codigo = batch.codigo_carga || batch.codigo || '';
+    (batch.registros || []).forEach(function(r){
       out.push({
         codigo_carga:     r.codigo_carga || codigo,
         estado_solicitud: r.estado_solicitud || batch.estado_solicitud || 'REGISTRADA',
         estado_pre:       r.estado_pre || batch.estado_pre || 'SIN_PRE',
         tipodoc:          r.tipodoc || 'DNI',
-        nro_documento:    String(r.nro_documento || '').trim(),
-        apellido_paterno: String(r.apellido_paterno || '').trim(),
-        apellido_materno: String(r.apellido_materno || '').trim(),
+        nro_documento:    String(r.nro_documento || r.nroDoc || '').trim(),
+        apellido_paterno: String(r.apellido_paterno || r.appat || '').trim(),
+        apellido_materno: String(r.apellido_materno || r.apmat || '').trim(),
         nombres:          String(r.nombres || '').trim(),
         ruc:              String(r.ruc || batch.ruc || '').trim(),
-        razon_social:     String(r.razon_social || batch.razon_social || '').trim(),
-        usuario_agente:   String(r.usuario_agente || batch.usuario_agente || '').trim(),
-        origen_onp:       String(r.origen_onp || '').trim(),
-        fecha_nacimiento: String(r.fecha_nacimiento || '').trim(),
-        mail_principal:   String(r.mail_principal || '').trim(),
+        razon_social:     String(r.razon_social || batch.razon_social || batch.razon || '').trim(),
+        usuario_agente:   String(r.usuario_agente || batch.usuario_agente || batch.usuario || '').trim(),
+        origen_onp:       String(r.origen_onp || r.origenONP || '').trim(),
+        fecha_nacimiento: String(r.fecha_nacimiento || r.fechaNac || '').trim(),
+        mail_principal:   String(r.mail_principal || r.email || '').trim(),
       });
     });
   });
@@ -220,7 +223,7 @@ function mostrarCodigosDisponibles(){
   const batches = loadBatches();
   if(batches.length === 0) return;
 
-  const codigos = batches.map(b => b.codigo_carga).filter(Boolean);
+  const codigos = batches.map(b => b.codigo_carga || b.codigo).filter(Boolean);
   if(codigos.length === 0) return;
 
   // Agregar hint debajo del campo de código

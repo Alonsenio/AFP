@@ -5,6 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Presentación y Pago de Planillas - AFPnet</title>
     <link rel="stylesheet" href="presentacion_y_pago_de_planillas.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+
 </head>
 <body>
     <!-- ===== TOP BAR ===== -->
@@ -21,7 +23,7 @@
     <main class="main-content">
         <!-- Breadcrumb -->
         <div class="page-header">
-            <h1>APORTES > PRESENTACIÓN Y PAGO DE PLANILLAS</h1>
+            <div class="page-banner"><span>APORTES &gt;</span> PRESENTACIÓN Y PAGO DE PLANILLAS</div>
         </div>
 
         <!-- Sección de Información -->

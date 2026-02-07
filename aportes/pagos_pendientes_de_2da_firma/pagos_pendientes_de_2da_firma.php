@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Pagos Pendientes de 2da Firma - AFPnet</title>
     <link rel="stylesheet" href="pagos_pendientes_de_2da_firma.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
 </head>
 <body>
     <!-- ===== TOP BAR ===== -->
@@ -20,9 +21,7 @@
     <!-- ===== CONTENIDO PRINCIPAL ===== -->
     <main class="main-content">
         <!-- Breadcrumb -->
-        <div class="page-header">
-            <h1>APORTES > PAGOS PENDIENTES DE 2DA FIRMA</h1>
-        </div>
+         <div class="page-banner"><span>APORTES &gt;</span>PAGOS PENDIENTES DE 2DA FIRMA</div>
 
         <!-- Sección de Filtros de Búsqueda -->
         <section class="content-section">

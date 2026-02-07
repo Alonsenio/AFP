@@ -5,7 +5,7 @@
         top: 54px;
         left: 0;
         bottom: 0;
-        width: 240px;
+        width: 250px;
         background: #f5f7fa;
         border-right: 1px solid #dce1e8;
         overflow-y: auto;

@@ -127,8 +127,7 @@ window.addEventListener("DOMContentLoaded", () => {
   updClk();
   setInterval(updClk, 1000);
 
-  // Sidebar
-  setupSidebar();
+  
 
   // Buscar
   document.getElementById("btn-buscar").addEventListener("click", onBuscar);
@@ -165,26 +164,7 @@ function updClk() {
     n.toLocaleDateString("es-PE", { day: "2-digit", month: "2-digit", year: "numeric" });
 }
 
-// ===== SIDEBAR =====
-function setupSidebar() {
-  const sb = document.getElementById("sb"),
-    mc = document.getElementById("mc"),
-    sov = document.getElementById("sov");
 
-  document.getElementById("btn-tog").onclick = () => {
-    if (innerWidth <= 768) {
-      sb.classList.toggle("mob");
-      sov.classList.toggle("vis");
-    } else {
-      sb.classList.toggle("collapsed");
-      mc.classList.toggle("exp");
-    }
-  };
-  sov.onclick = () => {
-    sb.classList.remove("mob");
-    sov.classList.remove("vis");
-  };
-}
 
 // Si tu sidebar.php usa esta función:
 function togSub(el) {

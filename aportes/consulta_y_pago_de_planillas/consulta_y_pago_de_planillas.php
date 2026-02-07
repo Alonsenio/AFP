@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Consulta y Pago de Planillas - AFPnet</title>
     <link rel="stylesheet" href="consulta_y_pago_de_planillas.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
 </head>
 <body>
     <!-- ===== TOP BAR ===== -->
@@ -19,10 +20,8 @@
 
     <!-- ===== CONTENIDO PRINCIPAL ===== -->
     <main class="main-content">
-        <!-- Breadcrumb -->
-        <div class="page-header">
-            <h1>APORTES > CONSULTA Y PAGO DE PLANILLAS</h1>
-        </div>
+        
+         <div class="page-banner"><span>APORTES &gt;</span>CONSULTA Y PAGO DE PLANILLAS</div>
 
         <!-- Sección de Filtros -->
         <section class="content-section">
