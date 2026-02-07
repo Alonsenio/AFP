@@ -43,9 +43,30 @@
                 <div class="form-group">
                     <label for="periodo">Periodo de Devengue: <span class="required">*</span></label>
                     <select id="periodo" name="periodo" required>
+                        <option value="2025-12">2025-12</option>
+                        <option value="2025-11">2025-11</option>
+                        <option value="2025-10">2025-10</option>
+                        <option value="2025-09">2025-09</option>
+                        <option value="2025-08">2025-08</option>
+                        <option value="2025-07">2025-07</option>
+                        <option value="2025-06">2025-06</option>
+                        <option value="2025-05">2025-05</option>
+                        <option value="2025-04">2025-04</option>
+                        <option value="2025-03">2025-03</option>
+                        <option value="2025-02">2025-02</option>
                         <option value="2025-01" selected>2025-01</option>
                         <option value="2024-12">2024-12</option>
                         <option value="2024-11">2024-11</option>
+                        <option value="2024-10">2024-10</option>
+                        <option value="2024-09">2024-09</option>
+                        <option value="2024-08">2024-08</option>
+                        <option value="2024-07">2024-07</option>
+                        <option value="2024-06">2024-06</option>
+                        <option value="2024-05">2024-05</option>
+                        <option value="2024-04">2024-04</option>
+                        <option value="2024-03">2024-03</option>
+                        <option value="2024-02">2024-02</option>
+                        <option value="2024-01">2024-01</option>
                     </select>
                 </div>
 
@@ -54,7 +75,7 @@
                     <div class="file-upload">
                         <input type="file" id="planilla" name="planilla" accept=".xlsx,.xls" style="display: none;">
                         <button type="button" class="btn-seleccionar" onclick="document.getElementById('planilla').click()">Seleccionar</button>
-                        <span id="nombre-archivo" class="nombre-archivo">Planilla_Nuevo_Formato_Ejemplo.xlsx</span>
+                        <span id="nombre-archivo" class="nombre-archivo">Ningún archivo seleccionado</span>
                     </div>
                 </div>
 

@@ -22,6 +22,7 @@
     <main class="main-content">
         
          <div class="page-banner"><span>APORTES &gt;</span>CONSULTA Y PAGO DE PLANILLAS</div>
+         
 
         <!-- Sección de Filtros -->
         <section class="content-section">

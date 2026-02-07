@@ -274,12 +274,19 @@ function renderResults(data) {
       <td>${a.pctcom ? a.pctcom : "-"}</td>
     `;
 
+   
     tr.addEventListener("click", () => {
-      // quitar selección previa
       tbody.querySelectorAll("tr").forEach(r => r.classList.remove("sel"));
       tr.classList.add("sel");
       selectedAffiliate = a;
     });
+
+    // Doble clic: quitar selección
+    tr.addEventListener("dblclick", () => {
+      tr.classList.remove("sel");
+      selectedAffiliate = null;
+    });
+
 
     tbody.appendChild(tr);
   });

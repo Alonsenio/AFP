@@ -1,4 +1,5 @@
 *,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+* { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif ; }
 :root{
   --blue:#1c3997;--blue-dk:#0f2260;--blue-lt:#e8edf8;
   --orange:#f39c12;--orange-dk:#e67e22;
@@ -51,10 +52,10 @@ a{text-decoration:none;color:inherit}
 .content{padding:22px 28px}
 
 /* Card */
-.card{background:#e9f7fb;border:1px solid #b2ebf2;border-radius:8px;padding:20px 22px;box-shadow:0 1px 4px rgba(0,0,0,.06)}
+.card{background:#f8f8f8;border:1px solid #ffffff;border-radius:8px;padding:20px 22px;box-shadow:0 1px 4px rgba(0,0,0,.06)}
 .grid-2{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px}
 .field label{font-size:13px;font-weight:900;color:#444;display:block;margin-bottom:6px}
-.field select,.field input{
+.field select,.field isnput{
   width:100%;padding:10px 12px;border:1px solid #ccc;border-radius:6px;outline:none;background:#fff;font-size:13px
 }
 .field input:focus,.field select:focus{border-color:var(--blue);box-shadow:0 0 0 2px rgba(28,57,151,.1)}

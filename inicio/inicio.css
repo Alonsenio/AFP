@@ -21,7 +21,7 @@ box-sizing: border-box;
 --sidebar-width: 220px;
 --topbar-height: 50px;
 }
-
+* { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif ; }
 body {
 font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 background: var(--gray-bg);

@@ -1,14 +1,14 @@
 * {
     box-sizing: border-box;
 }
+* { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif ; }
 
 body {
     margin: 0;
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    background: #e8f4fc;
+    background: #f0f2f5;
     min-height: 100vh;
 }
-
 
 
 .topbar-logo span {
@@ -63,7 +63,7 @@ body {
 
 /* ===== MAIN CONTENT ===== */
 .main {
-    margin-top: 56px;
+    margin-top: 54px;
     margin-left: 240px;
     padding: 0px;
     min-height: calc(100vh - 56px);

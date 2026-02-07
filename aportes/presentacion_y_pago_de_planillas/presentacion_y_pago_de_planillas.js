@@ -31,9 +31,15 @@ function actualizarNombreArchivo(e) {
     if (archivo) {
         nombreArchivo.textContent = archivo.name;
         nombreArchivo.style.background = 'linear-gradient(135deg, #4CAF50 0%, #66BB6A 100%)';
+        nombreArchivo.style.color = 'white';
+        nombreArchivo.style.border = '2px solid #4CAF50';
+        nombreArchivo.style.fontStyle = 'normal';
     } else {
-        nombreArchivo.textContent = 'Planilla_Nuevo_Formato_Ejemplo.xlsx';
-        nombreArchivo.style.background = '#003973';
+        nombreArchivo.textContent = 'Ningún archivo seleccionado';
+        nombreArchivo.style.background = '#f9fafb';
+        nombreArchivo.style.color = '#1f2937';
+        nombreArchivo.style.border = '2px solid #e5e7eb';
+        nombreArchivo.style.fontStyle = 'italic';
     }
 }
 

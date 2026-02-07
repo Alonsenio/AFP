@@ -1,4 +1,5 @@
 *,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+* { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif ; }
 :root{
     --blue:#1c3997;--blue-dk:#0f2260;--blue-lt:#e8edf8;
     --orange:#f39c12;--orange-dk:#e67e22;
@@ -96,6 +97,7 @@ a{text-decoration:none;color:inherit}
 .results-count{font-size:14px;color:#444;margin-bottom:14px}
 .results-count strong{color:var(--blue)}
 
+tbody tr.sel { background-color: #76c6df !important;  color: #000; /* opcional: texto en negro para contraste */ }
 .tbl-wrap{background:var(--white);border-radius:8px;overflow:hidden;box-shadow:0 1px 4px rgba(0,0,0,.08);margin-bottom:16px}
 .tbl-scroll{overflow-x:auto}
 table{width:100%;border-collapse:collapse;font-size:13px;white-space:nowrap}
@@ -103,7 +105,7 @@ thead th{background:var(--blue);color:var(--white);padding:12px 16px;text-align:
 thead th:last-child{border-right:none}
 tbody tr{transition:background .1s}
 tbody tr:nth-child(even){background:#f8f9fc}
-tbody tr:hover{background:#eef1f9}
+tbody tr:hover{background:#76c6df}
 tbody td{padding:10px 16px;border-bottom:1px solid #eee;color:#444;text-align:center}
 
 .important-note{font-size:13px;color:var(--red);margin-top:12px}

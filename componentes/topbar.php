@@ -1,4 +1,5 @@
 <style>
+    * { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif ; }
     /* ===== VARIABLES ===== */
     :root {
         --sidebar-width: 240px;

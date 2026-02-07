@@ -1,3 +1,4 @@
+* { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif ; }
 :root {
     --color-primario: #003973;
     --color-primario-claro: #0056b3;
@@ -24,7 +25,7 @@
     margin-top: 70px;
   
     min-height: calc(100vh - 70px);
-    background-color: var(--color-gris-claro);
+    
 }
 
 /* Header de Página */
@@ -43,7 +44,7 @@
 
 /* Sección de Contenido */
 .content-section {
-    background: white;
+    background: #f0f2f5;
     border-radius: var(--radio-borde);
     padding: 30px;
     margin-bottom: 30px;
