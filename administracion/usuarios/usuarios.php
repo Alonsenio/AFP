@@ -64,7 +64,7 @@
                         <thead>
                             <tr>
                                 <th>Usuario</th>
-                                <th>Nombre Completo</th>
+                                <th>Razon Social</th>
                                 <th>RUC Asociado</th>
                                 <th>Perfil</th>
                                 <th>Estado</th>
