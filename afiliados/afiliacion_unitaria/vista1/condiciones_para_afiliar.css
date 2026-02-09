@@ -50,7 +50,11 @@ a{text-decoration:none;color:inherit}
 .main.exp{margin-left:0}
 .page-banner{background:var(--blue);color:var(--white);padding:14px 28px;font-size:15px;font-weight:600}
 .page-banner span{opacity:.7}
-.content{padding:24px 28px}
+.content{padding:10px 30px; background-color: white; border-radius: 6px; margin-top: 20px; margin-left: 20px; margin-right: 20px; }
+.condiciones-list { list-style-type: none;  }
+.condiciones h2 { color: #0c509a; margin-bottom: 20px;}
+.content input { margin-bottom: 15px;  }
+
 
 /* SEARCH CARD */
 /* SEARCH CARD */

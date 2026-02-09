@@ -28,8 +28,9 @@
 
 /* Sección de Información */
 .info-section {
-    margin-bottom: 0;
+    margin-bottom: 20px;
     padding: 30px 30px 0;
+
 }
 
 .info-section:first-of-type {

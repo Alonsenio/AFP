@@ -111,9 +111,7 @@
         </div>
       </div>
 
-      <div class="note">
-        <strong>*Nota:</strong> Demo sin BD real. Genera “data faltante” con reglas + BD simulada.
-      </div>
+    
     </div>
 
   </div>

@@ -56,7 +56,11 @@ a{color:var(--blue);font-weight:800}
 .info-list{padding-left:18px;color:#444;line-height:1.55;font-size:13px}
 .info-list li{margin:4px 0}
 
+
 .card{background:#fff;border:1px solid var(--gray-bd);border-radius:8px;padding:18px;box-shadow:0 1px 4px rgba(0,0,0,.06)}
+.card h2{
+  color: #1c3997;
+}
 .form-row{display:flex;flex-direction:column;gap:10px}
 .lbl{font-weight:900;font-size:13px}
 .req{color:var(--red)}

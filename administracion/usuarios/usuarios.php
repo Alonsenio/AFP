@@ -52,9 +52,7 @@
                 <button class="btn-filter btn-blue-action" id="btn-agregar" type="button">
                     AGREGAR
                 </button>
-                <button class="btn-filter btn-red" id="btn-desactivar" type="button">
-                    DESACTIVAR
-                </button>
+            
             </div>
         </div>
 
