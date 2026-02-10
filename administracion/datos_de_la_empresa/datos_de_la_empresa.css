@@ -4,6 +4,7 @@
     padding: 0;
     box-sizing: border-box;
 }
+
 * { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif ; }
 
 body {
@@ -12,7 +13,6 @@ body {
     min-height: 100vh;
 }
 
-/* ===== VARIABLES ===== */
 :root {
     --sidebar-width: 220px;
     --topbar-height: 54px;
@@ -25,7 +25,6 @@ body {
     --title-blue: #2c5282;
 }
 
-/* ===== MAIN ===== */
 .main {
     margin-left: var(--sidebar-width);
     margin-top: var(--topbar-height);

@@ -18,7 +18,7 @@
     <main class="main" id="main-content">
         <!-- Banner de página -->
         
-        <div class="page-banner"><span>ADMINISTRACIÓN &gt;</span>DATOS DE LA EMPRESA</div>
+        <div class="page-banner"><span>ADMINISTRACIÓN&gt;</span>ACTUALIZACION DE DATOS DE LA EMPRESA</div>
 
         <div class="content">
             <form id="formDatosEmpresa">

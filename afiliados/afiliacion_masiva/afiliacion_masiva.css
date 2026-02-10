@@ -46,7 +46,7 @@ a{color:var(--blue);font-weight:800}
 /* MAIN */
 .main{margin-left:var(--sb-w);margin-top:var(--tb-h);min-height:calc(100vh - var(--tb-h));transition:margin-left .3s}
 .main.exp{margin-left:0}
-.page-banner{background:var(--blue);color:var(--white);padding:14px 28px;font-size:15px;font-weight:900}
+.page-banner{background:var(--blue);color:var(--white);padding:14px 28px;font-size:15px;font-weight:600}
 .page-banner span{opacity:.7}
 .content{padding:24px 28px}
 

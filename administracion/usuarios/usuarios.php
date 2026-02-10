@@ -18,7 +18,7 @@
 
 <!-- CONTENIDO -->
 <main class="main" id="mc">
-    <div class="page-banner"><span>ADMINISTRACIÓN &gt;</span> USUARIOS</div>
+    <div class="page-banner"><span>ADMINISTRACIÓN&gt;</span>USUARIOS</div>
 
     <div class="content">
     
