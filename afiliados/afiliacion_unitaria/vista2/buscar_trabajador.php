@@ -37,10 +37,10 @@
             <div class="msg msg-info vis" style="background:#e3f2fd;color:#1565c0;border-left:4px solid #1976d2;margin-bottom:20px;">
                 <i class="fas fa-info-circle"></i>
                 <span><strong>DNIs de prueba disponibles:</strong> 
-                    <code style="background:#fff;padding:2px 6px;border-radius:3px;font-weight:bold;">12345678</code> (Sin AFP) | 
-                    <code style="background:#fff;padding:2px 6px;border-radius:3px;font-weight:bold;">87654321</code> (Sin AFP) | 
-                    <code style="background:#fff;padding:2px 6px;border-radius:3px;font-weight:bold;">11111111</code> (Con AFP) | 
-                    <code style="background:#fff;padding:2px 6px;border-radius:3px;font-weight:bold;">22222222</code> (Con AFP)
+                    <code style="background:#fff;padding:2px 6px;border-radius:3px;font-weight:bold;">12345678</code>  | 
+                    <code style="background:#fff;padding:2px 6px;border-radius:3px;font-weight:bold;">87654321</code>  | 
+                    <code style="background:#fff;padding:2px 6px;border-radius:3px;font-weight:bold;">11111111</code>  | 
+                    <code style="background:#fff;padding:2px 6px;border-radius:3px;font-weight:bold;">22222222</code> 
                 </span>
             </div>
 
