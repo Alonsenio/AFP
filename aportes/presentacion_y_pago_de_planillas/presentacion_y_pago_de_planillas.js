@@ -207,7 +207,7 @@ function descargarPlanilla() {
     }
     * { margin: 0; padding: 0; box-sizing: border-box; }
     body { font-family: Arial, Helvetica, sans-serif; font-size: 11px; color: #000; padding: 20px; background: #fff; position: relative; }
-    .watermark { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%) rotate(-35deg); font-size: 100px; color: rgba(200,200,200,0.15); font-weight: bold; letter-spacing: 15px; pointer-events: none; z-index: 0; white-space: nowrap; }
+    .watermark { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%) rotate(-35deg); font-size: 100px; color: rgba(17, 74, 231, 0.3); font-weight: bold; letter-spacing: 15px; pointer-events: none; z-index: 0; white-space: nowrap; }
     .container { position: relative; z-index: 1; max-width: 1100px; margin: 0 auto; }
     
     /* Header */
@@ -265,7 +265,7 @@ function descargarPlanilla() {
 </head>
 <body>
 
-<div class="watermark">${estadoTexto}</div>
+<div class="watermark">Ejemplo</div>
 
 <button class="btn-print no-print" onclick="window.print()">🖨️ Imprimir / Guardar PDF</button>
 
@@ -517,8 +517,9 @@ function emitirTicket() {
         .no-print { display: none !important; }
     }
     * { margin: 0; padding: 0; box-sizing: border-box; }
-    body { font-family: Arial, Helvetica, sans-serif; font-size: 12px; color: #000; padding: 30px; background: #fff; }
-    .container { max-width: 700px; margin: 0 auto; border: 2px solid #003973; padding: 30px; }
+    body { font-family: Arial, Helvetica, sans-serif; font-size: 12px; color: #000; padding: 30px; background: #fff; position: relative; }
+    .watermark { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%) rotate(-35deg); font-size: 120px; color: rgba(17, 74, 231, 0.3); font-weight: bold; letter-spacing: 15px; pointer-events: none; z-index: 0; white-space: nowrap; }
+    .container { max-width: 700px; margin: 0 auto; border: 2px solid #003973; padding: 30px; position: relative; z-index: 1; }
     
     /* Header */
     .header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 20px; padding-bottom: 15px; border-bottom: 2px solid #003973; }
@@ -557,6 +558,7 @@ function emitirTicket() {
 </style>
 </head>
 <body>
+<div class="watermark">Ejemplo</div>
 
 <button class="btn-print no-print" onclick="window.print()">🖨️ Imprimir / Guardar PDF</button>
 
