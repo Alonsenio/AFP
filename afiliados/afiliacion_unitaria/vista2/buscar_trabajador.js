@@ -4,7 +4,7 @@
 
 // ===== GLOBALS =====
 const userRUC = sessionStorage.getItem("afpnet_ruc") || "20603401574";
-const uName = sessionStorage.getItem("afpnet_usuario") || "Usuario";
+const uName = sessionStorage.getItem("afpnet_nombre") || "Usuario";
 let selectedAffiliate = null;
 
 // ===== INIT =====
