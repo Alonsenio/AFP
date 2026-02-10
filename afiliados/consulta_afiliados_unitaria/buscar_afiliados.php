@@ -138,7 +138,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                 SUBSTRING_INDEX(Apellidos,' ',1) AS appat,
                                 SUBSTRING_INDEX(Apellidos,' ',-1) AS apmat,
                                 Nombres as nombres
-                            FROM estudiantes
+                            FROM Estudiantes
                             WHERE Numero LIKE ?";
                     
                     $stmt = $conn->prepare($sql);
@@ -158,7 +158,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                 SUBSTRING_INDEX(Apellidos,' ',1) AS appat,
                                 SUBSTRING_INDEX(Apellidos,' ',-1) AS apmat,
                                 Nombres as nombres
-                            FROM profesores
+                            FROM Profesores
                             WHERE DNI LIKE ?";
                     
                     $stmt = $conn->prepare($sql);
@@ -229,7 +229,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                 SUBSTRING_INDEX(Apellidos,' ',1) AS appat,
                                 SUBSTRING_INDEX(Apellidos,' ',-1) AS apmat,
                                 Nombres as nombres
-                            FROM estudiantes
+                            FROM Estudiantes
                             WHERE " . implode(" AND ", $whereCommon);
                     
                     $stmt = $conn->prepare($sql);
@@ -250,7 +250,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                 SUBSTRING_INDEX(Apellidos,' ',1) AS appat,
                                 SUBSTRING_INDEX(Apellidos,' ',-1) AS apmat,
                                 Nombres as nombres
-                            FROM profesores
+                            FROM Profesores
                             WHERE " . implode(" AND ", $whereCommon);
                     
                     $stmt = $conn->prepare($sql);
