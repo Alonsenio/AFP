@@ -1,6 +1,17 @@
 <?php
 header('Content-Type: application/json');
-include('../../../bd/conexion.php'); // Ajusta esta ruta según tu proyecto
+
+// Intentar conectar a la BD, pero capturar errores
+$usarDatosLocales = false;
+try {
+    include('../../../bd/conexion.php');
+    // Verificar si la conexión es válida
+    if (!isset($conn) || !$conn || $conn->connect_error) {
+        $usarDatosLocales = true;
+    }
+} catch (Exception $e) {
+    $usarDatosLocales = true;
+}
 
 /* =====================================
    FUNCIONES DE GENERACIÓN (SIMULACIÓN)
@@ -45,6 +56,66 @@ $sexos = ["MASCULINO", "FEMENINO"];
 $departamentos = ["LIMA", "AREQUIPA", "CUSCO", "PIURA", "LA LIBERTAD", "JUNIN", "ICA", "ANCASH", "AYACUCHO", "CAJAMARCA"];
 
 /* =====================================
+   DATOS LOCALES DE RESPALDO (FALLBACK)
+===================================== */
+$datosLocales = [
+    // Trabajador SIN AFP
+    [
+        'tipodoc' => 'DNI',
+        'numdoc' => '12345678',
+        'appat' => 'GARCIA',
+        'apmat' => 'LOPEZ',
+        'nombres' => 'JUAN CARLOS',
+        'tiene_afp' => false
+    ],
+    // Trabajador SIN AFP
+    [
+        'tipodoc' => 'DNI',
+        'numdoc' => '87654321',
+        'appat' => 'RODRIGUEZ',
+        'apmat' => 'MARTINEZ',
+        'nombres' => 'MARIA ELENA',
+        'tiene_afp' => false
+    ],
+    // Trabajador CON AFP
+    [
+        'tipodoc' => 'DNI',
+        'numdoc' => '11111111',
+        'appat' => 'PEREZ',
+        'apmat' => 'SANCHEZ',
+        'nombres' => 'CARLOS ALBERTO',
+        'tiene_afp' => true
+    ],
+    // Trabajador CON AFP
+    [
+        'tipodoc' => 'DNI',
+        'numdoc' => '22222222',
+        'appat' => 'TORRES',
+        'apmat' => 'GOMEZ',
+        'nombres' => 'ANA LUCIA',
+        'tiene_afp' => true
+    ],
+    // Trabajador con CE SIN AFP
+    [
+        'tipodoc' => 'CE',
+        'numdoc' => '001234567',
+        'appat' => 'GONZALEZ',
+        'apmat' => 'RAMIREZ',
+        'nombres' => 'PEDRO MIGUEL',
+        'tiene_afp' => false
+    ],
+    // Trabajador con CE CON AFP
+    [
+        'tipodoc' => 'CE',
+        'numdoc' => '007654321',
+        'appat' => 'MENDEZ',
+        'apmat' => 'SILVA',
+        'nombres' => 'SOFIA ISABEL',
+        'tiene_afp' => true
+    ]
+];
+
+/* =====================================
    PROCESO DE BÚSQUEDA
 ===================================== */
 
@@ -66,52 +137,75 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             throw new Exception('Debe ingresar el número de documento.');
         }
 
-        // A. Buscar en tabla estudiantes
-        // EXACTAMENTE IGUAL QUE buscar_afiliados.php
-        $sql = "SELECT 
-                    Tipoidentificacion as tipodoc,
-                    Numero as numdoc,
-                    SUBSTRING_INDEX(Apellidos,' ',1) AS appat,
-                    SUBSTRING_INDEX(Apellidos,' ',-1) AS apmat,
-                    Nombres as nombres
-                FROM estudiantes
-                WHERE Numero LIKE ?";
-        
-        $stmt = $conn->prepare($sql);
-        $searchParam = "%$numdoc%";
-        $stmt->bind_param("s", $searchParam);
-        $stmt->execute();
-        $res = $stmt->get_result();
-        while ($row = $res->fetch_assoc()) {
-            // Si tipodoc viene vacío de BD, asignamos DNI por defecto
-            if(empty($row['tipodoc'])) $row['tipodoc'] = 'DNI';
-            $results[] = $row;
+        // Si la BD está disponible, intentar buscar
+        if (!$usarDatosLocales) {
+            try {
+                // A. Buscar en tabla estudiantes
+                $sql = "SELECT 
+                            Tipoidentificacion as tipodoc,
+                            Numero as numdoc,
+                            SUBSTRING_INDEX(Apellidos,' ',1) AS appat,
+                            SUBSTRING_INDEX(Apellidos,' ',-1) AS apmat,
+                            Nombres as nombres
+                        FROM estudiantes
+                        WHERE Numero LIKE ?";
+                
+                $stmt = $conn->prepare($sql);
+                $searchParam = "%$numdoc%";
+                $stmt->bind_param("s", $searchParam);
+                $stmt->execute();
+                $res = $stmt->get_result();
+                while ($row = $res->fetch_assoc()) {
+                    // Si tipodoc viene vacío de BD, asignamos DNI por defecto
+                    if(empty($row['tipodoc'])) $row['tipodoc'] = 'DNI';
+                    $results[] = $row;
+                }
+
+                // B. Buscar en tabla profesores
+                $sql = "SELECT 
+                            'DNI' as tipodoc,
+                            DNI as numdoc,
+                            SUBSTRING_INDEX(Apellidos,' ',1) AS appat,
+                            SUBSTRING_INDEX(Apellidos,' ',-1) AS apmat,
+                            Nombres as nombres
+                        FROM profesores
+                        WHERE DNI LIKE ?";
+                
+                $stmt = $conn->prepare($sql);
+                $stmt->bind_param("s", $searchParam);
+                $stmt->execute();
+                $res = $stmt->get_result();
+                while ($row = $res->fetch_assoc()) {
+                    $results[] = $row;
+                }
+            } catch (Exception $dbError) {
+                // Si falla la consulta a BD, marcar para usar datos locales
+                $usarDatosLocales = true;
+                $results = []; // Limpiar resultados parciales
+            }
         }
 
-        // B. Buscar en tabla profesores
-        // EXACTAMENTE IGUAL QUE buscar_afiliados.php
-        $sql = "SELECT 
-                    'DNI' as tipodoc,
-                    DNI as numdoc,
-                    SUBSTRING_INDEX(Apellidos,' ',1) AS appat,
-                    SUBSTRING_INDEX(Apellidos,' ',-1) AS apmat,
-                    Nombres as nombres
-                FROM profesores
-                WHERE DNI LIKE ?";
-        
-        $stmt = $conn->prepare($sql);
-        $stmt->bind_param("s", $searchParam);
-        $stmt->execute();
-        $res = $stmt->get_result();
-        while ($row = $res->fetch_assoc()) {
-            $results[] = $row;
+        // Si no hay resultados de BD o la BD no está disponible, usar datos locales
+        if ($usarDatosLocales || empty($results)) {
+            foreach ($datosLocales as $dato) {
+                // Buscar coincidencias parciales
+                if (stripos($dato['numdoc'], $numdoc) !== false) {
+                    // Si se especificó tipo de documento, filtrar
+                    if (empty($tipodoc) || $dato['tipodoc'] === $tipodoc) {
+                        $results[] = $dato;
+                    }
+                }
+            }
         }
 
         // PROCESAR RESULTADOS Y COMPLETAR DATOS FALTANTES (SIMULACIÓN)
         $processedResults = [];
         foreach ($results as $row) {
-            // Decidir aleatoriamente si tiene AFP o no (60% tiene, 40% no tiene)
-            $tieneAFP = rand(1, 100) <= 60;
+            // Verificar si el dato local tiene información de AFP predefinida
+            $tieneAFPPredefinido = isset($row['tiene_afp']) ? $row['tiene_afp'] : null;
+            
+            // Si no está predefinido, decidir aleatoriamente (60% tiene, 40% no tiene)
+            $tieneAFP = $tieneAFPPredefinido !== null ? $tieneAFPPredefinido : (rand(1, 100) <= 60);
             
             if ($tieneAFP) {
                 // Generar datos AFP aleatorios
@@ -168,6 +262,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         $response['success'] = true;
         $response['data'] = $processedResults;
+        
+        // Si se usaron datos locales, agregar una nota informativa
+        if ($usarDatosLocales && !empty($processedResults)) {
+            $response['info'] = 'Usando datos de respaldo';
+        }
         
     } catch (Exception $e) {
         $response['error'] = $e->getMessage();

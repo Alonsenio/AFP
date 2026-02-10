@@ -215,7 +215,7 @@
                 <i class="fas fa-caret-down arrow"></i>
             </div>
             <div class="submenu">
-                <a href="/AFP/prueba/liquidaciones.php">Liquidaciones</a>
+                <a href="#">Liquidaciones</a>
                 <a href="#">Descargos de Cobranza</a>
             </div>
         </div>

@@ -1,14 +1,14 @@
 // 1. Base de datos simulada de usuarios
 
 const USUARIOS_VALIDOS = [
-    { ruc: '20601234567', user: 'MYPE01', pass: 'mype2025', nombre: 'EMPRESA DEMO MYPE S.A.C.', perfil: 'Administrador', regimen: 'MYPE TRIBUTARIO', codigoTributo: '3121', porcentajeRenta: 1.0 },
-    { ruc: '20609876543', user: 'MYPE02', pass: 'tributario', nombre: 'COMERCIAL EJEMPLO MYPE E.I.R.L.', perfil: 'Operador', regimen: 'MYPE TRIBUTARIO', codigoTributo: '3121', porcentajeRenta: 1.0 },
-    { ruc: '10456789012', user: 'PMYPE1', pass: 'persona10', nombre: 'GARCIA RODRIGUEZ JUAN CARLOS', perfil: 'Operador', regimen: 'MYPE TRIBUTARIO', codigoTributo: '3121', porcentajeRenta: 1.0 },
-    { ruc: '20501122334', user: 'ESPE01', pass: 'especial01', nombre: 'SERVICIOS ESPECIAL S.R.L.', perfil: 'Administrador', regimen: 'REGIMEN ESPECIAL', codigoTributo: '3111', porcentajeRenta: 1.5 },
-    { ruc: '20507788990', user: 'ESPE02', pass: 'rer2025', nombre: 'DISTRIBUIDORA RER S.A.C.', perfil: 'Administrador', regimen: 'REGIMEN ESPECIAL', codigoTributo: '3111', porcentajeRenta: 1.5 },
-    { ruc: '10321654987', user: 'PESPE1', pass: 'persona15', nombre: 'MARTINEZ LOPEZ MARIA ELENA', perfil: 'Operador', regimen: 'REGIMEN ESPECIAL', codigoTributo: '3111', porcentajeRenta: 1.5 },
-    { ruc: '20100123456', user: 'GENE01', pass: 'general01', nombre: 'CORPORACION GENERAL S.A.', perfil: 'Operador', regimen: 'REGIMEN GENERAL', codigoTributo: '3031', porcentajeRenta: 1.5 },
-    { ruc: '20100654321', user: 'GENE02', pass: 'general02', nombre: 'INDUSTRIAS PERU S.A.C.', perfil: 'Administrador', regimen: 'REGIMEN GENERAL', codigoTributo: '3031', porcentajeRenta: 1.5 }
+    { ruc: '20601234567', user: 'MYPE01', pass: 'mype2025', rs: 'EMPRESA DEMO MYPE S.A.C.', perfil: 'Administrador', regimen: 'MYPE TRIBUTARIO', codigoTributo: '3121', porcentajeRenta: 1.0, nombre: "JOSE LUIS CALDERON ORMEÑO" },
+    { ruc: '20609876543', user: 'MYPE02', pass: 'tributario', rs: 'COMERCIAL EJEMPLO MYPE E.I.R.L.', perfil: 'Operador', regimen: 'MYPE TRIBUTARIO', codigoTributo: '3121', porcentajeRenta: 1.0 },
+    { ruc: '10456789012', user: 'PMYPE1', pass: 'persona10', rs: 'GARCIA RODRIGUEZ JUAN CARLOS', perfil: 'Operador', regimen: 'MYPE TRIBUTARIO', codigoTributo: '3121', porcentajeRenta: 1.0 },
+    { ruc: '20501122334', user: 'ESPE01', pass: 'especial01', rs: 'SERVICIOS ESPECIAL S.R.L.', perfil: 'Administrador', regimen: 'REGIMEN ESPECIAL', codigoTributo: '3111', porcentajeRenta: 1.5 },
+    { ruc: '20507788990', user: 'ESPE02', pass: 'rer2025', rs: 'DISTRIBUIDORA RER S.A.C.', perfil: 'Administrador', regimen: 'REGIMEN ESPECIAL', codigoTributo: '3111', porcentajeRenta: 1.5 },
+    { ruc: '10321654987', user: 'PESPE1', pass: 'persona15', rs: 'MARTINEZ LOPEZ MARIA ELENA', perfil: 'Operador', regimen: 'REGIMEN ESPECIAL', codigoTributo: '3111', porcentajeRenta: 1.5 },
+    { ruc: '20100123456', user: 'GENE01', pass: 'general01', rs: 'CORPORACION GENERAL S.A.', perfil: 'Operador', regimen: 'REGIMEN GENERAL', codigoTributo: '3031', porcentajeRenta: 1.5 },
+    { ruc: '20100654321', user: 'GENE02', pass: 'general02', rs: 'INDUSTRIAS PERU S.A.C.', perfil: 'Administrador', regimen: 'REGIMEN GENERAL', codigoTributo: '3031', porcentajeRenta: 1.5 }
 ];
 
 // MOSTRAR CREDENCIALES
@@ -94,6 +94,7 @@ document.getElementById('frm-login-empleador').addEventListener('submit', functi
     sessionStorage.setItem('afpnet_sesion', 'true');
     sessionStorage.setItem('afpnet_ruc', auth.ruc);
     sessionStorage.setItem('afpnet_usuario', auth.user);
+    sessionStorage.setItem('afpnet_razon', auth.rs);
     sessionStorage.setItem('afpnet_nombre', auth.nombre);
     
     // Guardar BD en localStorage

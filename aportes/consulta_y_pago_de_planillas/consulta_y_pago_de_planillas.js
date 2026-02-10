@@ -390,7 +390,7 @@ function imprimirPlanilla(id) {
     @media print { body { margin: 0; } .no-print { display: none !important; } }
     * { margin: 0; padding: 0; box-sizing: border-box; }
     body { font-family: Arial, sans-serif; font-size: 10px; color: #000; padding: 15px; background: #fff; position: relative; }
-    .watermark { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%) rotate(-35deg); font-size: 90px; color: rgba(17, 74, 231, 0.3); font-weight: bold; letter-spacing: 12px; pointer-events: none; z-index: 0; }
+    .watermark { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%) rotate(-35deg); font-size: 45px; color: rgba(229, 229, 229, 0.66); font-weight: bold; letter-spacing: 12px; pointer-events: none; z-index: 0; }
     .container { position: relative; z-index: 1; max-width: 1100px; margin: 0 auto; }
     .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; border-bottom: 2px solid #003973; padding-bottom: 8px; }
     .header-left .logo-text { font-size: 20px; font-weight: bold; }
@@ -430,7 +430,7 @@ function imprimirPlanilla(id) {
 </style>
 </head>
 <body>
-<div class="watermark">EJEMPLO</div>
+<div class="watermark">DOCUMENTO EDUCATIVO</div>
 <button class="btn-print no-print" onclick="window.print()">🖨️ Imprimir / Guardar PDF</button>
 <div class="container">
     <div class="header">
@@ -602,7 +602,7 @@ function emitirTicketConsulta(id) {
     @media print { body { margin: 0; } .no-print { display: none !important; } }
     * { margin: 0; padding: 0; box-sizing: border-box; }
     body { font-family: Arial, sans-serif; font-size: 12px; color: #000; padding: 30px; background: #fff; position: relative; }
-    .watermark { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%) rotate(-35deg); font-size: 120px; color: rgba(17, 74, 231, 0.3); font-weight: bold; letter-spacing: 12px; pointer-events: none; z-index: 0; }
+    .watermark { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%) rotate(-35deg); font-size: 45px; color: rgba(229, 229, 229, 0.66); font-weight: bold; letter-spacing: 12px; pointer-events: none; z-index: 0; }
     .container { max-width: 700px; margin: 0 auto; border: 2px solid #003973; padding: 30px; position: relative; z-index: 1; }
     .header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 20px; padding-bottom: 15px; border-bottom: 2px solid #003973; }
     .header-left .logo { font-size: 22px; font-weight: bold; color: #003973; }
@@ -628,7 +628,7 @@ function emitirTicketConsulta(id) {
 </style>
 </head>
 <body>
-<div class="watermark">EJEMPLO</div>
+<div class="watermark">DOCUMENTO EDUCATIVO</div>
 <button class="btn-print no-print" onclick="window.print()">🖨️ Imprimir / Guardar PDF</button>
 <div class="container">
     <div class="header">

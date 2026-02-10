@@ -1,14 +1,6 @@
 "EXPLICACION DE FUNCIONAMIENTO DE CADA MODULO"
 ->  LOGIN:
-    ----USUARIOS PRUEBA---
-    1_USUARIO 1
-    ruc: '12345678910'
-    user: 'alonso'
-    pass: '12345678910'
-    2_USUARIO 2
-    ruc: '20987654321'
-    user: 'gustavo'
-    pass: '123456'
+    Usuario de prueba en el boton Registrate 
 
 ->  ADMINISTRACCION > USUARIOS:
     Se listan los usuarios que tienen acceso al afpnet y se filtran por usuario, nombre, ruc y rol  y funciona el agregar usuario

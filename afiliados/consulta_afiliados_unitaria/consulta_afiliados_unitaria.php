@@ -20,7 +20,25 @@
     <div class="page-banner"><span>AFILIADOS &gt;</span> CONSULTA DE AFILIADOS UNITARIA</div>
     <div class="content">
         <div class="search-card">
+            <!-- Mensaje de error -->
             <div class="msg msg-err" id="m-err"><i class="fas fa-exclamation-circle"></i><span id="m-err-t"></span></div>
+            
+            <!-- Mensaje informativo (BD offline) -->
+            <div class="msg msg-info" id="m-info" style="background:#fff3cd;color:#856404;border-left:4px solid #ffc107;">
+                <i class="fas fa-info-circle"></i>
+                <span id="m-info-t"></span>
+            </div>
+            
+            <!-- DNIs de Prueba Disponibles -->
+            <div class="msg msg-info vis" style="background:#e3f2fd;color:#1565c0;border-left:4px solid #1976d2;margin-bottom:20px;">
+                <i class="fas fa-info-circle"></i>
+                <span><strong>DNIs de prueba disponibles:</strong> 
+                    <code style="background:#fff;padding:2px 6px;border-radius:3px;font-weight:bold;">12345678</code> | 
+                    <code style="background:#fff;padding:2px 6px;border-radius:3px;font-weight:bold;">87654321</code> | 
+                    <code style="background:#fff;padding:2px 6px;border-radius:3px;font-weight:bold;">11111111</code>
+                </span>
+            </div>
+            
             <div class="search-option">
                 <label class="radio-label">
                     <input type="radio" name="search-type" value="cuspp" id="r-cuspp">

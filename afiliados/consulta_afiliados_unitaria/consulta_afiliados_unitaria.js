@@ -1,5 +1,3 @@
-/* CONSULTA AFILIADOS UNITARIA */
-
 // ===== GLOBALS =====
 const userRUC = sessionStorage.getItem('afpnet_ruc') || '20603401574';
 const uName = sessionStorage.getItem('afpnet_usuario') || 'Usuario';
@@ -81,11 +79,24 @@ function hideE(){
     document.getElementById('m-err').classList.remove('vis');
 }
 
+function showInfo(m){
+    const infoEl = document.getElementById('m-info');
+    if(infoEl){
+        document.getElementById('m-info-t').textContent = m;
+        infoEl.classList.add('vis');
+    }
+}
+function hideInfo(){
+    const infoEl = document.getElementById('m-info');
+    if(infoEl) infoEl.classList.remove('vis');
+}
+
 // ===== SEARCH WITH AJAX =====
 const btnBuscar = document.getElementById('btn-buscar');
 if(btnBuscar){
     btnBuscar.addEventListener('click', function(){
         hideE();
+        hideInfo();
         document.getElementById('results').classList.remove('vis');
 
         const type = document.querySelector('input[name="search-type"]:checked').value;
@@ -138,12 +149,21 @@ if(btnBuscar){
             method: 'POST',
             body: formData
         })
-        .then(response => response.json())
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Error en la respuesta del servidor');
+            }
+            return response.json();
+        })
         .then(data => {
             btn.classList.remove('loading'); 
             btn.disabled = false;
 
             if(data.success){
+                // Mostrar mensaje informativo si se usan datos locales
+                if(data.info){
+                    showInfo(data.info);
+                }
                 renderResults(data.data);
             } else {
                 showE(data.error || 'Error al realizar la búsqueda');
@@ -152,8 +172,8 @@ if(btnBuscar){
         .catch(error => {
             btn.classList.remove('loading'); 
             btn.disabled = false;
-            showE('Error de conexión con el servidor');
-            console.error('Error:', error);
+            showE('Error de conexión con el servidor. Usando datos locales de respaldo.');
+            
         });
     });
 }
@@ -176,7 +196,6 @@ function renderResults(data){
 
     data.forEach(a => {
         const tr = document.createElement('tr');
-        // AQUÍ ESTÁ EL ORDEN CORREGIDO SEGÚN TU SOLICITUD:
         tr.innerHTML = `
             <td style="font-weight:600">${a.tipodoc} - ${a.numdoc}</td>
             <td>${a.appat}</td>

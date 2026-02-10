@@ -1,115 +1,5 @@
 /*
 // Base de datos local (COMENTADA - ahora se usa consulta al servidor)
-const affiliatesDB = [
-  // --- TIPO A (sin AFP) ---
-  {
-    tipodoc: "DNI",
-    numdoc: "77658978",
-    appat: "ALBUJAR",
-    apmat: "TORRES",
-    nombres: "FELIX ALONSO",
-    fechanac: "1998-04-02",
-    sexo: "MASCULINO",
-    estcivil: "SOLTERO",
-    depNac: "ICA",
-    provNac: "ICA",
-    distNac: "ICA",
-    nacionalidad: "PERÚ",
-
-    // AFP opcional (vacío en tipo A)
-    cuspp: "",
-    afp: "",
-    tipocom: "",
-    pctcom: "",
-    devmax: "",
-    motivo: ""
-  },
-  {
-    tipodoc: "DNI",
-    numdoc: "32165498",
-    appat: "MENDEZ",
-    apmat: "GONZALES",
-    nombres: "PEDRO LUIS",
-    fechanac: "1995-11-18",
-    sexo: "MASCULINO",
-    estcivil: "CASADO",
-    depNac: "LIMA",
-    provNac: "LIMA",
-    distNac: "ATE",
-    nacionalidad: "PERÚ",
-    cuspp: "",
-    afp: "",
-    tipocom: "",
-    pctcom: "",
-    devmax: "",
-    motivo: ""
-  },
-
-  // --- TIPO B (con AFP) ---
-  {
-    tipodoc: "DNI",
-    numdoc: "10379368",
-    appat: "ALZAMORA",
-    apmat: "LARA",
-    nombres: "NEVARDO ALCIDES",
-    fechanac: "1989-06-10",
-    sexo: "MASCULINO",
-    estcivil: "SOLTERO",
-    depNac: "PIURA",
-    provNac: "PIURA",
-    distNac: "CASTILLA",
-    nacionalidad: "PERÚ",
-
-    cuspp: "572741NALAA6",
-    afp: "INTEGRA",
-    tipocom: "Mixta",
-    pctcom: "1.55%",
-    devmax: "2026-01",
-    motivo: "Retiro del 95.5%"
-  },
-  {
-    tipodoc: "DNI",
-    numdoc: "45678912",
-    appat: "GARCIA",
-    apmat: "LOPEZ",
-    nombres: "MARIA ELENA",
-    fechanac: "1993-02-21",
-    sexo: "FEMENINO",
-    estcivil: "SOLTERA",
-    depNac: "AREQUIPA",
-    provNac: "AREQUIPA",
-    distNac: "YANAHUARA",
-    nacionalidad: "PERÚ",
-
-    cuspp: "612345MGLPE2",
-    afp: "PRIMA",
-    tipocom: "Flujo",
-    pctcom: "1.69%",
-    devmax: "2026-02",
-    motivo: ""
-  },
-  {
-    tipodoc: "CE",
-    numdoc: "CE201456",
-    appat: "TORRES",
-    apmat: "SILVA",
-    nombres: "ANA PATRICIA",
-    fechanac: "1990-09-03",
-    sexo: "FEMENINO",
-    estcivil: "CASADA",
-    depNac: "CUSCO",
-    provNac: "CUSCO",
-    distNac: "WANCHAQ",
-    nacionalidad: "PERÚ",
-
-    cuspp: "623456APTSI1",
-    afp: "INTEGRA",
-    tipocom: "Mixta",
-    pctcom: "1.55%",
-    devmax: "2026-01",
-    motivo: ""
-  }
-];
 */
 
 // ===== GLOBALS =====
@@ -128,8 +18,6 @@ window.addEventListener("DOMContentLoaded", () => {
 
   updClk();
   setInterval(updClk, 1000);
-
-  
 
   // Buscar
   document.getElementById("btn-buscar").addEventListener("click", onBuscar);
@@ -166,8 +54,6 @@ function updClk() {
     n.toLocaleDateString("es-PE", { day: "2-digit", month: "2-digit", year: "numeric" });
 }
 
-
-
 // Si tu sidebar.php usa esta función:
 function togSub(el) {
   const sub = el.nextElementSibling;
@@ -187,6 +73,7 @@ function togSub(el) {
     el.classList.remove("open");
   }
 }
+
 function cerrarSesion() {
   sessionStorage.clear();
   location.href = "../../login/login.php";
@@ -201,9 +88,22 @@ function hideE() {
   document.getElementById("m-err").classList.remove("vis");
 }
 
+function showInfo(m) {
+  const infoEl = document.getElementById("m-info");
+  if (infoEl) {
+    document.getElementById("m-info-t").textContent = m;
+    infoEl.classList.add("vis");
+  }
+}
+function hideInfo() {
+  const infoEl = document.getElementById("m-info");
+  if (infoEl) infoEl.classList.remove("vis");
+}
+
 // ===== SEARCH =====
 function onBuscar() {
   hideE();
+  hideInfo();
   selectedAffiliate = null;
 
   const section = document.getElementById("results");
@@ -232,12 +132,21 @@ function onBuscar() {
     method: 'POST',
     body: formData
   })
-  .then(response => response.json())
+  .then(response => {
+    if (!response.ok) {
+      throw new Error('Error en la respuesta del servidor');
+    }
+    return response.json();
+  })
   .then(data => {
     btn.classList.remove("loading");
     btn.disabled = false;
 
     if (data.success) {
+      // Mostrar mensaje informativo si se usan datos locales
+      if (data.info) {
+        showInfo(data.info);
+      }
       renderResults(data.data);
     } else {
       showE(data.error || 'Error al realizar la búsqueda');
@@ -246,7 +155,7 @@ function onBuscar() {
   .catch(error => {
     btn.classList.remove("loading");
     btn.disabled = false;
-    showE('Error de conexión con el servidor');
+    showE('Error de conexión con el servidor. Usando datos locales de respaldo.');
     console.error('Error:', error);
   });
 }

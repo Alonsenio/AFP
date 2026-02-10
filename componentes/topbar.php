@@ -311,7 +311,7 @@
 
         <!-- INFO: RUC + Bienvenida -->
         <div class="topbar-info">
-            <span class="ruc" id="tb-ruc">20603401574</span> - <span id="tb-razon">CORPORACION DE FORMACION CONTINUA DEL PERU S.A.C.</span><br>
+            <span class="ruc" id="tb-ruc">20603401574</span> - <span id="tb-razon"></span><br>
             Bienvenido Sr(a). <strong id="w-name">Usuario</strong> (<span id="w-perfil">Administrador</span>)
         </div>
     </div>
@@ -343,7 +343,7 @@
     const userRUC  = sessionStorage.getItem('afpnet_ruc') || '20603401574';
     const uNombre  = sessionStorage.getItem('afpnet_nombre') || sessionStorage.getItem('afpnet_usuario') || 'Usuario';
     const uPerfil  = sessionStorage.getItem('afpnet_perfil') || 'Administrador';
-    const uRazon   = sessionStorage.getItem('afpnet_razon') || 'CORPORACION DE FORMACION CONTINUA DEL PERU S.A.C.';
+    const uRazon   = sessionStorage.getItem('afpnet_razon') || sessionStorage.getItem('afpnet_rs') || 'CORPORACION DE FORMACION CONTINUA DEL PERU S.A.C.';
 
     // Capitalizar nombre
     const dn = uNombre.charAt(0).toUpperCase() + uNombre.slice(1);
