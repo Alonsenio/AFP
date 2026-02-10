@@ -9,23 +9,18 @@
 </head>
 <body>
 
-<!-- TOPBAR -->
 <?php
     require "../../componentes/topbar.php"
 ?>
 <div class="sov" id="sov"></div>
-<!-- SIDEBAR -->
 <?php
     require "../../componentes/sidebar.php"
 ?>
-<!-- CONTENIDO -->
 <main class="main" id="mc">
     <div class="page-banner"><span>AFILIADOS &gt;</span> CONSULTA DE AFILIADOS UNITARIA</div>
     <div class="content">
-        <!-- SEARCH FORM -->
         <div class="search-card">
             <div class="msg msg-err" id="m-err"><i class="fas fa-exclamation-circle"></i><span id="m-err-t"></span></div>
-            <!-- Option 1: CUSPP -->
             <div class="search-option">
                 <label class="radio-label">
                     <input type="radio" name="search-type" value="cuspp" id="r-cuspp">
@@ -34,7 +29,6 @@
                 <input type="text" class="search-input w-cuspp" id="inp-cuspp" placeholder="" maxlength="20" disabled autocomplete="off">
             </div>
 
-            <!-- Option 2: Tipo Documento -->
             <div class="search-option">
                 <label class="radio-label">
                     <input type="radio" name="search-type" value="documento" id="r-doc" checked>
@@ -50,7 +44,6 @@
                 <input type="text" class="search-input w-doc" id="inp-numdoc" placeholder="" maxlength="15" autocomplete="off">
             </div>
 
-            <!-- Option 3: Por Nombres -->
             <div class="search-option" style="align-items:flex-start">
                 <label class="radio-label" style="margin-top:6px">
                     <input type="radio" name="search-type" value="nombres" id="r-names">
@@ -72,14 +65,12 @@
                 </div>
             </div>
 
-            <!-- Buttons -->
             <div class="btn-row">
                 <button class="btn btn-green"><i class="fas fa-book"></i> GUIA DE USO</button>
                 <button class="btn btn-orange" id="btn-buscar"><span class="spinner"></span><i class="fas fa-search"></i> BUSCAR</button>
             </div>
         </div>
 
-        <!-- RESULTS -->
         <div class="results" id="results">
             <p class="results-count" id="res-count"></p>
             <div class="tbl-wrap">
@@ -94,9 +85,11 @@
                                 <th>CUSPP</th>
                                 <th>Devengue máximo<br>para aportar</th>
                                 <th>Motivo de pensión</th>
+                                <th>Último devengue en el SPP</th>
+                                <th>Motivo de salida del SPP</th>
                                 <th>AFP</th>
                                 <th>Tipo de Comisión</th>
-                                <th>% de Comisión</th>
+                                <th>Porcentaje de Comisión</th>
                             </tr>
                         </thead>
                         <tbody id="res-body"></tbody>

@@ -1,4 +1,5 @@
-
+/*
+// Base de datos local (COMENTADA - ahora se usa consulta al servidor)
 const affiliatesDB = [
   // --- TIPO A (sin AFP) ---
   {
@@ -109,6 +110,7 @@ const affiliatesDB = [
     motivo: ""
   }
 ];
+*/
 
 // ===== GLOBALS =====
 const userRUC = sessionStorage.getItem("afpnet_ruc") || "20603401574";
@@ -215,27 +217,44 @@ function onBuscar() {
     return;
   }
 
-  let results = affiliatesDB.filter(a => {
-    const matchNum = a.numdoc.includes(num);
-    const matchTipo = !tipo || a.tipodoc === tipo;
-    return matchNum && matchTipo;
-  });
+  // Preparar datos del formulario
+  const formData = new FormData();
+  formData.append('numdoc', num);
+  formData.append('tipodoc', tipo);
 
   // Loading effect
   const btn = document.getElementById("btn-buscar");
   btn.classList.add("loading");
   btn.disabled = true;
 
-  setTimeout(() => {
+  // Realizar petición AJAX
+  fetch('./buscar_trabajador_backend.php', {
+    method: 'POST',
+    body: formData
+  })
+  .then(response => response.json())
+  .then(data => {
     btn.classList.remove("loading");
     btn.disabled = false;
-    renderResults(results);
-  }, 600);
+
+    if (data.success) {
+      renderResults(data.data);
+    } else {
+      showE(data.error || 'Error al realizar la búsqueda');
+    }
+  })
+  .catch(error => {
+    btn.classList.remove("loading");
+    btn.disabled = false;
+    showE('Error de conexión con el servidor');
+    console.error('Error:', error);
+  });
 }
 
 // ===== RENDER RESULTS =====
 function renderResults(data) {
   const section = document.getElementById("results");
+  const thead = document.querySelector("#results table thead tr");
   const tbody = document.getElementById("res-body");
   const countEl = document.getElementById("res-count");
 
@@ -254,6 +273,35 @@ function renderResults(data) {
     (data.length > 1 ? "s" : "") +
     ". (Haga clic en una fila para seleccionar)";
 
+  // Detectar si algún registro tiene AFP
+  const tieneAFP = data.some(a => a.cuspp && a.cuspp !== "");
+
+  // Cambiar encabezados según si tiene AFP o no
+  if (tieneAFP) {
+    // ESTRUCTURA 2: CON AFP
+    thead.innerHTML = `
+      <th>CUSPP</th>
+      <th>AFP</th>
+      <th>Tipo Doc</th>
+      <th>Numero Doc</th>
+      <th>Apellido Paterno</th>
+      <th>Apellido Materno</th>
+      <th>Nombres</th>
+      <th>Fecha Nacimiento</th>
+    `;
+  } else {
+    // ESTRUCTURA 1: SIN AFP
+    thead.innerHTML = `
+      <th>DNI</th>
+      <th>Apellido Paterno</th>
+      <th>Apellido Materno</th>
+      <th>Nombres</th>
+      <th>Fecha Nacimiento</th>
+      <th>Sexo</th>
+      <th>Estado Civil</th>
+    `;
+  }
+
   data.forEach(a => {
     const tr = document.createElement("tr");
 
@@ -261,20 +309,32 @@ function renderResults(data) {
     tr.dataset.tipodoc = a.tipodoc;
     tr.dataset.numdoc = a.numdoc;
 
-    tr.innerHTML = `
-      <td style="font-weight:600">${a.tipodoc} - ${a.numdoc}</td>
-      <td>${a.appat}</td>
-      <td>${a.apmat}</td>
-      <td>${a.nombres}</td>
-      <td style="font-weight:600;color:var(--blue)">${a.cuspp ? a.cuspp : "-"}</td>
-      <td>${a.devmax ? a.devmax : "-"}</td>
-      <td>${a.motivo ? a.motivo : "-"}</td>
-      <td style="font-weight:600">${a.afp ? a.afp : "-"}</td>
-      <td>${a.tipocom ? a.tipocom : "-"}</td>
-      <td>${a.pctcom ? a.pctcom : "-"}</td>
-    `;
+    // Renderizar según estructura
+    if (tieneAFP) {
+      // ESTRUCTURA 2: CON AFP
+      tr.innerHTML = `
+        <td style="font-weight:600;color:var(--blue)">${a.cuspp || "-"}</td>
+        <td style="font-weight:600">${a.afp || ""}</td>
+        <td>${a.tipodoc}</td>
+        <td style="font-weight:600">${a.numdoc}</td>
+        <td>${a.appat}</td>
+        <td>${a.apmat}</td>
+        <td>${a.nombres}</td>
+        <td>${a.fechanac || "-"}</td>
+      `;
+    } else {
+      // ESTRUCTURA 1: SIN AFP
+      tr.innerHTML = `
+        <td style="font-weight:600">${a.numdoc}</td>
+        <td>${a.appat}</td>
+        <td>${a.apmat}</td>
+        <td>${a.nombres}</td>
+        <td>${a.fechanac || "-"}</td>
+        <td>${a.sexo || "-"}</td>
+        <td>${a.estcivil || "-"}</td>
+      `;
+    }
 
-   
     tr.addEventListener("click", () => {
       tbody.querySelectorAll("tr").forEach(r => r.classList.remove("sel"));
       tr.classList.add("sel");
@@ -286,7 +346,6 @@ function renderResults(data) {
       tr.classList.remove("sel");
       selectedAffiliate = null;
     });
-
 
     tbody.appendChild(tr);
   });

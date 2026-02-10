@@ -1,15 +1,4 @@
-
-// ===== SAMPLE DATA (simulated affiliates database) =====
-const affiliatesDB = [
-    {tipodoc:'DNI',numdoc:'10379368',appat:'ALZAMORA',apmat:'LARA',nombres:'NEVARDO ALCIDES',cuspp:'572741NALAA6',devmax:'2026-01',motivo:'Retiro del 95.5%',afp:'INTEGRA',tipocom:'Mixta',pctcom:'1.55%'},
-    {tipodoc:'DNI',numdoc:'45678912',appat:'GARCIA',apmat:'LOPEZ',nombres:'MARIA ELENA',cuspp:'612345MGLPE2',devmax:'2026-02',motivo:'',afp:'PRIMA',tipocom:'Flujo',pctcom:'1.69%'},
-    {tipodoc:'DNI',numdoc:'78912345',appat:'RODRIGUEZ',apmat:'HUAMAN',nombres:'CARLOS EMILIO',cuspp:'578912CREHU4',devmax:'2026-01',motivo:'',afp:'HABITAT',tipocom:'Mixta',pctcom:'1.47%'},
-    {tipodoc:'DNI',numdoc:'32165498',appat:'MENDEZ',apmat:'GONZALES',nombres:'PEDRO LUIS',cuspp:'534561PLMEG8',devmax:'2025-12',motivo:'',afp:'PROFUTURO',tipocom:'Flujo',pctcom:'1.69%'},
-    {tipodoc:'CE',numdoc:'CE201456',appat:'TORRES',apmat:'SILVA',nombres:'ANA PATRICIA',cuspp:'623456APTSI1',devmax:'2026-01',motivo:'',afp:'INTEGRA',tipocom:'Mixta',pctcom:'1.55%'},
-    {tipodoc:'DNI',numdoc:'11223344',appat:'QUISPE',apmat:'MAMANI',nombres:'JUAN CARLOS',cuspp:'511223JCQMA3',devmax:'2026-02',motivo:'',afp:'PRIMA',tipocom:'Flujo',pctcom:'1.69%'},
-    {tipodoc:'DNI',numdoc:'99887766',appat:'FLORES',apmat:'DIAZ',nombres:'ROSA MARIA',cuspp:'599887RMFLD7',devmax:'2025-11',motivo:'Jubilación anticipada',afp:'HABITAT',tipocom:'Mixta',pctcom:'1.47%'},
-    {tipodoc:'PAS',numdoc:'PA445566',appat:'VARGAS',apmat:'CASTRO',nombres:'DIEGO FERNANDO',cuspp:'644556DFVCA5',devmax:'2026-01',motivo:'',afp:'PROFUTURO',tipocom:'Flujo',pctcom:'1.69%'},
-];
+/* CONSULTA AFILIADOS UNITARIA */
 
 // ===== GLOBALS =====
 const userRUC = sessionStorage.getItem('afpnet_ruc') || '20603401574';
@@ -17,21 +6,23 @@ const uName = sessionStorage.getItem('afpnet_usuario') || 'Usuario';
 
 // ===== INIT =====
 window.addEventListener('DOMContentLoaded', () => {
-    const dn = uName.charAt(0).toUpperCase() + uName.slice(1);
-    document.getElementById('w-name').textContent = dn;
-    document.getElementById('u-name').textContent = dn;
-    document.getElementById('u-init').textContent = dn.substring(0,2).toUpperCase();
-    document.getElementById('tb-ruc').textContent = userRUC;
-    document.getElementById('tb-razon').textContent = 'EMPRESA S.A.C.';
+    // Si tienes elementos en tu topbar para mostrar usuario/ruc:
+    const elName = document.getElementById('w-name');
+    if(elName) elName.textContent = uName;
+    
+    // Configuración básica
     updClk(); setInterval(updClk, 1000);
     setupRadios();
 });
 
 function updClk(){
     const n = new Date();
-    document.getElementById('tb-time').innerHTML =
+    const elTime = document.getElementById('tb-time');
+    if(elTime) {
+        elTime.innerHTML =
         n.toLocaleTimeString('es-PE',{hour:'2-digit',minute:'2-digit',second:'2-digit',hour12:true}) +
         '<br>' + n.toLocaleDateString('es-PE',{day:'2-digit',month:'2-digit',year:'numeric'});
+    }
 }
 
 
@@ -39,84 +30,133 @@ function updClk(){
 function setupRadios(){
     const radios = document.querySelectorAll('input[name="search-type"]');
     radios.forEach(r => r.addEventListener('change', updateInputStates));
-    updateInputStates();
+    // Ejecutar una vez al inicio para setear estado
+    if(radios.length > 0) updateInputStates();
 }
 
 function updateInputStates(){
-    const selected = document.querySelector('input[name="search-type"]:checked').value;
+    const selectedEl = document.querySelector('input[name="search-type"]:checked');
+    if(!selectedEl) return;
+    
+    const selected = selectedEl.value;
 
     // CUSPP
-    document.getElementById('inp-cuspp').disabled = selected !== 'cuspp';
+    const inpCuspp = document.getElementById('inp-cuspp');
+    if(inpCuspp) inpCuspp.disabled = selected !== 'cuspp';
 
     // Documento
-    document.getElementById('sel-tipodoc').disabled = selected !== 'documento';
-    document.getElementById('inp-numdoc').disabled = selected !== 'documento';
+    const selTipo = document.getElementById('sel-tipodoc');
+    const inpNum = document.getElementById('inp-numdoc');
+    if(selTipo) selTipo.disabled = selected !== 'documento';
+    if(inpNum) inpNum.disabled = selected !== 'documento';
 
     // Nombres
-    document.getElementById('inp-appat').disabled = selected !== 'nombres';
-    document.getElementById('inp-apmat').disabled = selected !== 'nombres';
-    document.getElementById('inp-nombres').disabled = selected !== 'nombres';
+    const inpAppat = document.getElementById('inp-appat');
+    const inpApmat = document.getElementById('inp-apmat');
+    const inpNom = document.getElementById('inp-nombres');
+    
+    if(inpAppat) inpAppat.disabled = selected !== 'nombres';
+    if(inpApmat) inpApmat.disabled = selected !== 'nombres';
+    if(inpNom) inpNom.disabled = selected !== 'nombres';
 
-    // Clear disabled inputs
-    if(selected !== 'cuspp') document.getElementById('inp-cuspp').value = '';
-    if(selected !== 'documento'){ document.getElementById('inp-numdoc').value = ''; document.getElementById('sel-tipodoc').value = ''; }
+    // Limpiar campos al cambiar
+    if(selected !== 'cuspp' && inpCuspp) inpCuspp.value = '';
+    if(selected !== 'documento'){ 
+        if(inpNum) inpNum.value = ''; 
+        if(selTipo) selTipo.value = ''; 
+    }
     if(selected !== 'nombres'){
-        document.getElementById('inp-appat').value = '';
-        document.getElementById('inp-apmat').value = '';
-        document.getElementById('inp-nombres').value = '';
+        if(inpAppat) inpAppat.value = '';
+        if(inpApmat) inpApmat.value = '';
+        if(inpNom) inpNom.value = '';
     }
 }
 
 // ===== MESSAGES =====
-function showE(m){document.getElementById('m-err-t').textContent=m;document.getElementById('m-err').classList.add('vis')}
-function hideE(){document.getElementById('m-err').classList.remove('vis')}
+function showE(m){
+    document.getElementById('m-err-t').textContent=m;
+    document.getElementById('m-err').classList.add('vis');
+}
+function hideE(){
+    document.getElementById('m-err').classList.remove('vis');
+}
 
-// ===== SEARCH =====
-document.getElementById('btn-buscar').addEventListener('click', function(){
-    hideE();
-    document.getElementById('results').classList.remove('vis');
+// ===== SEARCH WITH AJAX =====
+const btnBuscar = document.getElementById('btn-buscar');
+if(btnBuscar){
+    btnBuscar.addEventListener('click', function(){
+        hideE();
+        document.getElementById('results').classList.remove('vis');
 
-    const type = document.querySelector('input[name="search-type"]:checked').value;
-    let results = [];
+        const type = document.querySelector('input[name="search-type"]:checked').value;
+        
+        // Preparar datos del formulario
+        const formData = new FormData();
+        formData.append('searchType', type);
 
-    if(type === 'cuspp'){
-        const val = document.getElementById('inp-cuspp').value.trim().toUpperCase();
-        if(!val){showE('Debe ingresar el código CUSPP.');return}
-        results = affiliatesDB.filter(a => a.cuspp.toUpperCase().includes(val));
-    }
-    else if(type === 'documento'){
-        const num = document.getElementById('inp-numdoc').value.trim();
-        if(!num){showE('Debe ingresar el número de documento.');return}
-        const tipo = document.getElementById('sel-tipodoc').value;
-        results = affiliatesDB.filter(a => {
-            const matchNum = a.numdoc.includes(num);
-            const matchTipo = !tipo || a.tipodoc === tipo;
-            return matchNum && matchTipo;
+        // Validar y agregar datos según el tipo de búsqueda
+        if(type === 'cuspp'){
+            const val = document.getElementById('inp-cuspp').value.trim().toUpperCase();
+            if(!val){
+                showE('Debe ingresar el código CUSPP.');
+                return;
+            }
+            formData.append('cuspp', val);
+        }
+        else if(type === 'documento'){
+            const num = document.getElementById('inp-numdoc').value.trim();
+            if(!num){
+                showE('Debe ingresar el número de documento.');
+                return;
+            }
+            const tipo = document.getElementById('sel-tipodoc').value;
+            formData.append('numdoc', num);
+            formData.append('tipodoc', tipo);
+        }
+        else if(type === 'nombres'){
+            const appat = document.getElementById('inp-appat').value.trim().toUpperCase();
+            const apmat = document.getElementById('inp-apmat').value.trim().toUpperCase();
+            const nombres = document.getElementById('inp-nombres').value.trim().toUpperCase();
+            
+            if(!appat && !apmat && !nombres){
+                showE('Debe ingresar al menos un campo de nombre.');
+                return;
+            }
+            
+            formData.append('appat', appat);
+            formData.append('apmat', apmat);
+            formData.append('nombres', nombres);
+        }
+
+        // Loading effect
+        const btn = this;
+        btn.classList.add('loading'); 
+        btn.disabled = true;
+
+        // Realizar petición AJAX
+        fetch('./buscar_afiliados.php', {
+            method: 'POST',
+            body: formData
+        })
+        .then(response => response.json())
+        .then(data => {
+            btn.classList.remove('loading'); 
+            btn.disabled = false;
+
+            if(data.success){
+                renderResults(data.data);
+            } else {
+                showE(data.error || 'Error al realizar la búsqueda');
+            }
+        })
+        .catch(error => {
+            btn.classList.remove('loading'); 
+            btn.disabled = false;
+            showE('Error de conexión con el servidor');
+            console.error('Error:', error);
         });
-    }
-    else if(type === 'nombres'){
-        const appat = document.getElementById('inp-appat').value.trim().toUpperCase();
-        const apmat = document.getElementById('inp-apmat').value.trim().toUpperCase();
-        const nombres = document.getElementById('inp-nombres').value.trim().toUpperCase();
-        if(!appat && !apmat && !nombres){showE('Debe ingresar al menos un campo de nombre.');return}
-        results = affiliatesDB.filter(a => {
-            let match = true;
-            if(appat) match = match && a.appat.toUpperCase().includes(appat);
-            if(apmat) match = match && a.apmat.toUpperCase().includes(apmat);
-            if(nombres) match = match && a.nombres.toUpperCase().includes(nombres);
-            return match;
-        });
-    }
-
-    // Loading effect
-    const btn = this;
-    btn.classList.add('loading'); btn.disabled = true;
-
-    setTimeout(()=>{
-        btn.classList.remove('loading'); btn.disabled = false;
-        renderResults(results);
-    }, 800);
-});
+    });
+}
 
 // ===== RENDER RESULTS =====
 function renderResults(data){
@@ -136,6 +176,7 @@ function renderResults(data){
 
     data.forEach(a => {
         const tr = document.createElement('tr');
+        // AQUÍ ESTÁ EL ORDEN CORREGIDO SEGÚN TU SOLICITUD:
         tr.innerHTML = `
             <td style="font-weight:600">${a.tipodoc} - ${a.numdoc}</td>
             <td>${a.appat}</td>
@@ -144,6 +185,8 @@ function renderResults(data){
             <td style="font-weight:600;color:var(--blue)">${a.cuspp}</td>
             <td>${a.devmax}</td>
             <td>${a.motivo || '-'}</td>
+            <td>${a.ultimo_devengue || '-'}</td>
+            <td>${a.motivo_salida || '-'}</td>
             <td style="font-weight:600">${a.afp}</td>
             <td>${a.tipocom}</td>
             <td>${a.pctcom}</td>
@@ -158,19 +201,22 @@ function renderResults(data){
 // ===== Allow Enter key to trigger search =====
 document.querySelectorAll('.search-input').forEach(inp => {
     inp.addEventListener('keypress', e => {
-        if(e.key === 'Enter') document.getElementById('btn-buscar').click();
+        if(e.key === 'Enter') {
+            const btn = document.getElementById('btn-buscar');
+            if(btn) btn.click();
+        }
     });
 });
 
 // ===== Only numbers for document input =====
-document.getElementById('inp-numdoc').addEventListener('input', function(){
-    // Allow alphanumeric for CE/PAS
-    const tipo = document.getElementById('sel-tipodoc').value;
-    if(!tipo || tipo === 'DNI'){
-        this.value = this.value.replace(/[^0-9]/g, '');
-    }
-});
-
-
-
-
+const inpNumDoc = document.getElementById('inp-numdoc');
+if(inpNumDoc){
+    inpNumDoc.addEventListener('input', function(){
+        // Allow alphanumeric for CE/PAS if needed, but per request keeping logic simple
+        const sel = document.getElementById('sel-tipodoc');
+        const tipo = sel ? sel.value : '';
+        if(!tipo || tipo === 'DNI'){
+            this.value = this.value.replace(/[^0-9]/g, '');
+        }
+    });
+}

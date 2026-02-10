@@ -11,6 +11,25 @@ const USUARIOS_VALIDOS = [
     { ruc: '20100654321', user: 'GENE02', pass: 'general02', nombre: 'INDUSTRIAS PERU S.A.C.', perfil: 'Administrador', regimen: 'REGIMEN GENERAL', codigoTributo: '3031', porcentajeRenta: 1.5 }
 ];
 
+// MOSTRAR CREDENCIALES
+const modal = document.getElementById("modal");
+const closeBtn = document.querySelector(".close");
+const registrate = document.getElementById("registrate");
+
+if(registrate) {
+    registrate.addEventListener("click", (e) => {
+        e.preventDefault();
+        const u = USUARIOS_VALIDOS[0]; // aquí decides cuál mostrar
+        document.getElementById("cred-ruc").textContent = u.ruc;
+        document.getElementById("cred-user").textContent = u.user;
+        document.getElementById("cred-pass").textContent = u.pass;
+        modal.style.display = "block";
+    });
+}
+if(closeBtn) closeBtn.onclick = () => modal.style.display = "none";
+window.onclick = (event) => { if (event.target == modal) modal.style.display = "none"; };
+
+
 
 // Cambio de pestañas (Tabs)
 document.querySelectorAll('.tab').forEach(tab => {

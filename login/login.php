@@ -19,9 +19,21 @@
                     <a href="#">¿QUÉ ES AFPNET?</a>
                     <a href="#">¿QUÉ HACE AFPNET?</a>
                     <a href="#">MANUAL DE USO</a>
-                    <a href="#">REGISTRATE</a>
+                    <a href="#" id="registrate">REGÍSTRATE</a>
                 </nav>
+                
             </div>
+            <!-- Modal -->
+            <div id="modal" class="modal">
+            <div class="modal-content">
+                <span class="close">&times;</span>
+                <h2>Credenciales de acceso</h2>
+                <p><strong>RUC:</strong> <span id="cred-ruc"></span></p>
+                <p><strong>Usuario:</strong> <span id="cred-user"></span></p>
+                <p><strong>Contraseña:</strong> <span id="cred-pass"></span></p>
+            </div>
+            </div>
+
             <div class="login-card">
                 <h2 class="login-title">Iniciar Sesión</h2>
 
